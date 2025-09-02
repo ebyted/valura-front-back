@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   valura-mail:
     build: ./backend # Directory containing your Node.js Dockerfile
