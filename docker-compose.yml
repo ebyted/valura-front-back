@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  valura-mail:
+    build: ./backend # Directory containing your Node.js Dockerfile
+    ports:
+      - "3015:3015" # Map container port 3015 to host port 3015
+    expose:
+      - "3015" # Explicitly expose port 3015 within the Docker network
+    container_name: valura-mail # Optional: give it a specific container name
+    networks:
+      - dokploy-network
+
+  valura-homepage:
+    build: ./frontend # Directory containing your Apache Dockerfile
+    ports:
+      - "80:80" # Map container port 80 to host port 80
+    networks:
+      - dokploy-network
+
+networks:
+  dokploy-network:
+    driver: bridge

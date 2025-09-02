@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulación Cotización Valura</title>
+</head>
+<body>
+  <h2>Formulario de Cotización (Simulación)</h2>
+  <form id="cotizacionForm">
+    <label>Nombre: <input type="text" name="nombre" value="Juan Pérez" required></label><br>
+    <label>Teléfono: <input type="text" name="telefono" value="5551234567" required></label><br>
+    <label>Correo electrónico: <input type="email" name="email" value="ebyted@hotmail.com" required></label><br>
+    <label>Servicio: <input type="text" name="servicio" value="Avalúo Inmobiliario" required></label><br>
+    <label>Uso del avalúo: <input type="text" name="uso_avaluo" value="Compra-Venta"></label><br>
+    <label>Tipo de propiedad: <input type="text" name="tipo_propiedad" value="Casa"></label><br>
+    <label>Dirección Calle: <input type="text" name="direccion_calle" value="Av. Reforma"></label><br>
+    <label>Número: <input type="text" name="direccion_numero" value="123"></label><br>
+    <label>Colonia: <input type="text" name="direccion_colonia" value="Centro"></label><br>
+    <label>Ciudad: <input type="text" name="direccion_ciudad" value="CDMX"></label><br>
+    <label>Estado: <input type="text" name="direccion_estado" value="Ciudad de México"></label><br>
+    <label>m² Terreno: <input type="number" name="m2_terreno" value="200"></label><br>
+    <label>m² Construcción: <input type="number" name="m2_construccion" value="150"></label><br>
+    <label>Notas adicionales: <input type="text" name="notas" value="Solicito cotización urgente"></label><br>
+    <button type="submit">Enviar Cotización</button>
+  </form>
+  <div id="resultado"></div>
+
+  <script>
+    document.getElementById('cotizacionForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = Object.fromEntries(new FormData(form).entries());
+
+      try {
+        const response = await fetch('https://whm.emmibrows.com/cotizar', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const text = await response.text();
+        document.getElementById('resultado').textContent = text;
+      } catch (err) {
+        document.getElementById('resultado').textContent = 'Error al enviar la cotización.';
+      }
+    });
+  </script>
+</body>
+</html>

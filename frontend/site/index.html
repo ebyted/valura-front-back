@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Valura </title>
+  <!-- Importa Outfit e Inter desde Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family:Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style-bold.css">
+  <style>
+    /* Mejor visibilidad y alineación para el bloque extra */
+    .quote-extra-info.destacado {
+      margin: 2.5em auto 2em auto;
+      background: linear-gradient(90deg, #e6f3fa 0%, #d2f4ea 100%);
+      border: 2px solid #0097a7;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+      padding: 1.5em 1em;
+      max-width: 420px;
+      text-align: center;
+      font-size: 1.13em;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 1em;
+      justify-content: center;
+    }
+
+    .quote-extra-info .info-icon {
+      font-size: 2em;
+      color: #009688;
+      flex-shrink: 0;
+    }
+
+    .quote-extra-info .whatsapp-link {
+      color: #25d366;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+
+    /* Nota informativa para Ensenada */
+    .ensenada-notice {
+      background-color: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 6px;
+      padding: 0.75em;
+      margin-top: 0.5em;
+      font-size: 0.9em;
+      color: #856404;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none !important;
+      }
+    }
+
+    /* Alineación uniforme para tarjetas de servicios */
+    .services-grid-bold {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+      gap: 2rem !important;
+      align-items: stretch !important;
+    }
+
+    .service-card-bold {
+      display: flex !important;
+      flex-direction: column !important;
+      height: 100% !important;
+      align-items: flex-start !important;
+    }
+
+    .service-content {
+      display: flex !important;
+      flex-direction: column !important;
+      height: 100% !important;
+      justify-content: flex-start !important;
+      padding: 1.5rem !important;
+    }
+
+    .service-description {
+      flex-grow: 1 !important;
+      margin-bottom: 1rem !important;
+    }
+
+    .service-price {
+      margin-top: 1rem !important;
+      padding-top: 1rem !important;
+      border-top: 1px solid #e0eaf1 !important;
+    }
+
+    .service-requirements {
+      margin-top: 1rem !important;
+    }
+
+    /* Estilos para la tabla comparativa de servicios */
+    .services-table-container {
+      overflow-x: auto;
+      margin-top: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    .services-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .services-table th, .services-table td {
+      padding: 1.2rem;
+      text-align: left;
+      border-bottom: 1px solid #e0eaf1;
+    }
+
+    .services-table th {
+      background-color: #f9f9f9;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .service-row:hover {
+      background-color: #f1f8ff;
+    }
+
+    .service-name-col {
+      width: 30%;
+    }
+
+    .price-col {
+      width: 15%;
+    }
+
+    .description-col {
+      width: 35%;
+    }
+
+    .requirements-col {
+      width: 20%;
+    }
+
+    .ideal-col {
+      width: 25%;
+    }
+
+    .service-icon {
+      margin-right: 0.5rem;
+      font-size: 1.2em;
+    }
+
+    .service-validity {
+      display: block;
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 0.3em;
+    }
+
+    .valid {
+      color: #28a745;
+      font-weight: 500;
+    }
+
+    .featured {
+      background-color: #e8f5e9;
+    }
+
+    /* Estilos para la nota informativa en la sección de servicios */
+    .services-note {
+      background-color: #e9f7fe;
+      border: 1px solid #b3e5fc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .note-icon {
+      font-size: 2em;
+      color: #17a2b8;
+      flex-shrink: 0;
+    }
+
+    .btn-note {
+      background-color: #17a2b8;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-block;
+      transition: background-color 0.3s;
+    }
+
+    .btn-note:hover {
+      background-color: #138496;
+    }
+
+    /* Estilos para la sección de servicios con pestañas */
+    .services-tabs {
+      display: flex;
+      justify-content: center;
+      margin-top: 2rem;
+      gap: 1rem;
+    }
+
+    .tab-button {
+      background-color: #f1f1f1;
+      border: none;
+      border-radius: 4px;
+      padding: 0.75rem 1.5rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background-color 0.3s;
+    }
+
+    .tab-button.active {
+      background-color: #0097a7;
+      color: #fff;
+    }
+
+    .tab-icon {
+      font-size: 1.2em;
+    }
+
+    .tab-content {
+      display: none;
+      margin-top: 1.5rem;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .services-grid-tabs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .service-card-tab {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .service-card-header {
+      background-color: #f7f7f7;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .service-icon-large {
+      font-size: 2.5em;
+      color: #009688;
+      flex-shrink: 0;
+    }
+
+    .service-title-area {
+      flex-grow: 1;
+      margin-left: 1rem;
+    }
+
+    .service-badge {
+      background-color: #e1f5fe;
+      color: #01579b;
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      font-size: 0.9em;
+      font-weight: 500;
+      display: inline-block;
+      margin-top: 0.5rem;
+    }
+
+    .service-price-main {
+      text-align: right;
+    }
+
+    .price {
+      font-size: 1.5em;
+      font-weight: 700;
+      color: #d32f2f;
+    }
+
+    .currency {
+      font-size: 0.9em;
+      vertical-align: super;
+    }
+
+    .service-card-body {
+      padding: 1.5rem;
+      flex-grow: 1;
+    }
+
+    .service-desc {
+      margin-bottom: 1.5rem;
+      color: #555;
+    }
+
+    .service-highlights {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .highlight-item {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      padding: 0.75rem 1rem;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .highlight-icon {
+      font-size: 1.2em;
+      flex-shrink: 0;
+    }
+
+    .service-card-footer {
+      padding: 1.5rem;
+      text-align: center;
+      background-color: #f9f9f9;
+    }
+
+    .btn-select-service {
+      background-color: #009688;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.3s;
+    }
+
+    .btn-select-service.primary {
+      background-color: #00796b;
+    }
+
+    .btn-select-service:hover {
+      background-color: #00796b;
+    }
+
+    /* Estilos para la sección de requisitos */
+    .requirements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .requirement-card {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+    }
+
+    .req-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .req-icon {
+      font-size: 1.5em;
+      color: #009688;
+      flex-shrink: 0;
+    }
+
+    .req-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .req-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .req-check {
+      font-size: 1.2em;
+      color: #4caf50;
+      flex-shrink: 0;
+    }
+
+    .req-item.optional .req-check {
+      color: #ffa000;
+    }
+
+    /* Estilos para la tabla de comparación */
+    .comparison-container {
+      margin-top: 1.5rem;
+    }
+
+    .comparison-selectors {
+      margin-bottom: 1.5rem;
+    }
+
+    .service-checkboxes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .service-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+    }
+
+    .checkbox-custom {
+      width: 1.2em;
+      height: 1.2em;
+      border: 2px solid #009688;
+      border-radius: 4px;
+      display: inline-block;
+      position: relative;
+    }
+
+    .checkbox-custom::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0.6em;
+      height: 0.6em;
+      background-color: #009688;
+      border-radius: 2px;
+      transform: translate(-50%, -50%) scale(0);
+      transition: transform 0.2s;
+    }
+
+    input[type="checkbox"]:checked + .checkbox-custom::after {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .comparison-table-container {
+      overflow-x: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .comparison-table th, .comparison-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e0eaf1;
+    }
+
+    .comparison-table th {
+      background-color: #f9f9f9;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .compare-col {
+      width: 25%;
+    }
+
+    /* Estilos para la nota informativa en la sección de servicios con pestañas */
+    .services-note-tabs {
+      background-color: #e9f7fe;
+      border: 1px solid #b3e5fc;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .note-icon {
+      font-size: 2em;
+      color: #17a2b8;
+      flex-shrink: 0;
+    }
+
+    .btn-note {
+      background-color: #17a2b8;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-block;
+      transition: background-color 0.3s;
+    }
+
+    .btn-note:hover {
+      background-color: #138496;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <!-- Navigation -->
+    <nav class="nav-bold">
+      <div class="nav-content">
+        <div class="logo-bold">
+          <img src="/assets/images/Logo_Principal.png" alt="Valura Logo" class="logo-img">
+        </div>
+        <div class="nav-menu">
+          <a href="#servicios" class="nav-link">Servicios</a>
+          <a href="#proceso" class="nav-link">Proceso</a>
+          <a href="#cotizar" class="nav-link">Cotizar</a>
+          <div class="nav-contact">
+            <span class="contact-text">¿Necesitas ayuda?</span>
+            <a href="tel:+52-646-384-3985" class="contact-phone">+52 646 384 3985</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bold">
+      <div class="hero-container">
+        <div class="hero-grid">
+          <div class="hero-content-bold">
+            <h1 class="hero-title">
+              <span class="title-line-1">VALOR</span>
+              <span class="title-line-2">sin complicaciones</span>
+            </h1>
+            <p class="hero-description">
+              Claridad, valor y forma en <strong>valura.mx</strong>
+            </p>
+            <p class="hero-subtitle">
+              Más allá de un simple trámite, en Valura creemos que valorar una propiedad 
+              es valorar bien una decisión. Acompañamos a nuestros clientes en decisiones 
+              clave entregando valor real a través de procesos precisos.
+            </p>
+            <!-- Hero Stats Section -->
+            <div id="hero-stats" class="hero-stats" style="margin-top: 2em;">
+              <div class="stats-grid">
+               
+              </div>
+            </div>
+            <script>
+              function toggleHeroStats() {
+                var stats = document.getElementById('hero-stats');
+                if (window.innerWidth <= 768) {
+                  stats.style.display = 'none';
+                } else {
+                  stats.style.display = '';
+                }
+              }
+              window.addEventListener('DOMContentLoaded', toggleHeroStats);
+              window.addEventListener('resize', toggleHeroStats);
+            </script>
+            <style>
+              .hero-stats {
+                width: 100%;
+                max-width: 600px;
+                margin: 2em auto 0 auto;
+                display: flex;
+                justify-content: center;
+              }
+              .stats-grid {
+                display: flex;
+                gap: 2em;
+                justify-content: center;
+                width: 100%;
+              }
+              .stat-item {
+                text-align: center;
+                background: #e6f3fa;
+                border-radius: 10px;
+                padding: 1em 2em;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                min-width: 120px;
+              }
+              .stat-value {
+                font-size: 2em;
+                font-weight: 700;
+                color: #0097a7;
+                display: block;
+              }
+              .stat-label {
+                font-size: 1em;
+                color: #333;
+                margin-top: 0.5em;
+                display: block;
+              }
+              @media (max-width: 768px) {
+                .hero-stats {
+                  display: none !important;
+                }
+              }
+            </style>
+          </div>
+          <div class="hero-actions-right">
+            <div class="hero-actions">
+              <a href="#cotizar" class="btn-primary-bold">
+                <span>OBTENER COTIZACIÓN</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M7 17L17 7M17 7H8M17 7V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+              <a href="#servicios" class="btn-secondary-bold">
+                <span>Ver servicios</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Section - Cards con Pestañas -->
+    <section id="servicios" class="services-bold">
+      <div class="container-bold">
+        <div class="section-header-bold">
+          <div class="header-content">
+            <span class="section-tag">Nuestros servicios</span>
+          </div>
+        </div>
+        <div class="services-grid-bold">
+          <!-- Card: Estimación de valor -->
+          <div class="service-card-bold" style="align-items: flex-start;">
+            <div class="service-content" style="justify-content: flex-start;">
+              <div class="service-header" style="margin-bottom: 0.5em;">
+                <h2 style="margin: 0;">Estimación de valor</h2>
+              </div>
+              <p class="service-description" style="margin-top: 0;">
+                Opinión profesional rápida y confiable sobre el valor aproximado de tu inmueble.<br>
+                Ideal para tomar decisiones informadas, planificar financieramente o negociar la compra/venta.<br>
+                Herramienta previa a un avalúo formal (sin validez oficial).
+              </p>
+              <div class="service-price" style="margin-top: 1em;">
+                <span class="price">Costo inicial: <strong>Desde $1,500 MXN</strong></span>
+              </div>
+              <div class="service-requirements" style="margin-top: 1em;">
+                <strong>Requisitos:</strong>
+                <ul class="service-features">
+                  <li>Copia del predial (actualizado y pagado)</li>
+                  <li>Datos del propietario</li>
+                  <li>Documento que acredite la propiedad (escritura o contrato)</li>
+                  <li>Planos (si hay construcción)</li>
+                  <li class="text-note">Entre más información proporciones, más precisa será la estimación.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Card: Avalúo Fiscal o Comercial -->
+          <div class="service-card-bold" style="align-items: flex-start;">
+            <div class="service-content" style="justify-content: flex-start;">
+              <div class="service-header" style="margin-bottom: 0.5em;">
+                <h2 style="margin: 0;">Avalúo Fiscal o Comercial</h2>
+              </div>
+              <p class="service-description" style="margin-top: 0;">
+                Estudio técnico con validez legal que determina el valor real de tu propiedad mediante métodos profesionales.<br>
+                Requerido para trámites como compra-venta, escrituración, herencias, impuestos, traslado de dominio y más.<br>
+                Documento oficial firmado por perito autorizado.
+              </p>
+              <div class="service-price" style="margin-top: 1em;">
+                <span class="price">Costo inicial: <strong>Desde $2,500 MXN</strong></span>
+              </div>
+              <div class="service-requirements" style="margin-top: 1em;">
+                <strong>Requisitos:</strong>
+                <ul class="service-features">
+                  <li>Acceso total al inmueble</li>
+                  <li>Copia del predial (actualizado y pagado)</li>
+                  <li>Datos del propietario</li>
+                  <li>Documento que acredite la propiedad (escritura o contrato)</li>
+                  <li>Planos arquitectónicos (si existen)</li>
+                  <li>Deslinde</li>
+                  <li>Régimen de condominio (si aplica)</li>
+                  <li>Boleto de agua</li>
+                  <li class="text-note">Entre más información proporciones, más rápido y preciso será el avalúo.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Card: Inspección de Propiedad -->
+          <div class="service-card-bold" style="align-items: flex-start;">
+            <div class="service-content" style="justify-content: flex-start;">
+              <div class="service-header" style="margin-bottom: 0.5em;">
+                <h2 style="margin: 0;">Inspección de Propiedad</h2>
+              </div>
+              <p class="service-description text-accent" style="margin-top: 0;">
+                Informe visual detallado del estado físico del inmueble, útil para detectar daños, riesgos o detalles importantes.<br>
+                Dirigido especialmente a compradores a distancia o quienes buscan una opinión técnica objetiva antes de cerrar una operación.
+              </p>
+              <div class="service-features" style="margin-top: 1em;">
+                <strong>Incluye:</strong>
+                <ul>
+                  <li>Evaluación visual técnica</li>
+                  <li>Reporte fotográfico</li>
+                  <li>Opinión de valor</li>
+                </ul>
+              </div>
+              <div class="service-price" style="margin-top: 1em;">
+                <span class="price">Costo inicial: <strong>Desde $3,500 MXN</strong></span>
+              </div>
+              <div class="service-requirements" style="margin-top: 1em;">
+                <strong>Requisitos:</strong>
+                <ul class="service-features">
+                  <li>Acceso total al inmueble</li>
+                  <li>Copia del predial</li>
+                  <li>Datos del propietario</li>
+                  <li>Documento que acredite la propiedad</li>
+                  <li>Planos (si los hay)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!-- Card: Planos y Levantamiento -->
+          <div class="service-card-bold" style="align-items: flex-start;">
+            <div class="service-content" style="justify-content: flex-start;">
+              <div class="service-header" style="margin-bottom: 0.5em;">
+                <h2 style="margin: 0;">Planos y Levantamiento</h2>
+              </div>
+              <p class="service-description" style="margin-top: 0;">
+                Levantamiento técnico para elaborar o actualizar planos arquitectónicos del inmueble.<br>
+                útil para trámites de regularización, base para remodelación o simplemente tener planos actualizados del inmueble.
+              </p>
+              <div class="service-price" style="margin-top: 1em;">
+                <span class="price">Costo inicial: <strong>Desde $4,000 MXN</strong></span>
+              </div>
+              <div class="service-requirements" style="margin-top: 1em;">
+                <strong>Requisitos:</strong>
+                <ul class="service-features">
+                  <li>✔ Acceso total al inmueble</li>
+                  <li>✔ Planos existentes (si se tienen)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+        <!-- Process Section -->
+    <section id="proceso" class="process-bold">
+      <div class="container-bold">
+        <div class="section-header-bold centered">
+          <span class="section-tag">Nuestro proceso</span>
+          <h2 class="section-title">
+            Así trabajamos :
+            <span class="gradient-text-bold">resultados técnicos de calidad y asesoría clara en cada paso.</span>
+          </h2>
+        </div>
+
+        <div class="process-timeline">
+          <div class="timeline-item">
+            <div class="timeline-number">01</div>
+            <div class="timeline-content">
+              <h3>Solicitud y revisión de documentos</h3>
+              <p>Escoge el servicio que necesitas. Te indicamos los requisitos, revisamos tu documentación y agendamos la cita para la visita técnica.</p>
+              <div class="timeline-image">
+                <img src="assets/images/document_checklist.png" alt="Documentos">
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-number">02</div>
+            <div class="timeline-content">
+              <h3>Inspección técnica</h3>
+              <p>Un perito profesional realiza la visita, evalúa las condiciones del inmueble, toma medidas si es necesario y atiende cualquier duda relacionada con el servicio contratado.</p>
+              <div class="timeline-image">
+                <img src="assets/images/imagen_1_tecnico.png" alt="Inspección">
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-number">03</div>
+            <div class="timeline-content">
+              <h3>Análisis y desarrollo del informe</h3>
+              <p>Procesamos la información recabada y elaboramos tu documento aplicando criterios técnicos y metodologías profesionales, garantizando claridad, precisión y calidad.</p>
+              <div class="timeline-image">
+                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/3bf9cb968c-c8a3ebc0debda22128f3.png" alt="Análisis">
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-number">04</div>
+            <div class="timeline-content">
+              <h3>Entrega de resultados</h3>
+              <p>Recibes tu documento en formato digital, en tiempo y forma. También puedes solicitar la versión física firmada y sellada, si la necesitas para un trámite oficial.</p>
+              <div class="timeline-image">
+                <img src="assets/images/avaluos.png" alt="Entrega">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quote Section con formulario dinámico -->
+    <section id="cotizar" class="quote-bold" style="max-width: 900px; margin: 0 auto;">
+      <div class="container-bold" style="max-width: 100%; padding-left: 16px; padding-right: 16px;">
+      <div class="quote-layout" style="display: flex; flex-wrap: wrap; gap: 32px; justify-content: center;">
+        <div class="quote-info" style="flex: 1 1 350px; min-width: 300px;">
+          <!-- INICIA BLOQUE MEJORADO -->
+          <div class="info-box-quote">
+            <div class="info-box-icon">💡</div>
+            <h3>¿Listo para comenzar?</h3>
+            
+            <div class="info-box-steps">
+              <h4>Tu servicio en 6 pasos:</h4>
+              <ul>
+                <li><span class="step-icon">1.</span> Llena el formulario</li>
+                <li><span class="step-icon">2.</span> Revisa tu cotización</li>
+                <li><span class="step-icon">3.</span> Confirma el servicio</li>
+                <li><span class="step-icon">4.</span> Agenda tu cita</li>
+                <li><span class="step-icon">5.</span> Comparte documentos</li>
+                <li><span class="step-icon">6.</span> Recibe tu servicio completo</li>
+              </ul>
+            </div>
+
+            <div class="info-box-contact">
+              <p>¿Dudas o necesitas asesoría?</p>
+              <a href="https://wa.me/526463843985" target="_blank" class="btn-whatsapp">
+                por WhatsApp
+              </a>
+            </div>
+          </div>
+          <!-- TERMINA BLOQUE MEJORADO -->
+        </div>
+        <div class="quote-form-container">
+            <!-- Formulario dinámico de cotización personalizada -->
+            <h3 style="text-align: center; margin-bottom: 1.5em; font-size: 1.5em; color: var(--gray-800);">Formulario para cotización</h3>
+            <form class="quote-form-bold" id="cotizacionForm" autocomplete="off" action="#" method="POST">
+              <!-- El formulario se enviará solo por JavaScript -->
+              <input type="hidden" name="_cc" id="cc_email">
+              
+              <div class="form-group">
+                <label for="nombre">Nombre completo *</label>
+                <input type="text" id="nombre" name="nombre" required>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="telefono">Teléfono *</label>
+                  <input type="tel" id="telefono" name="telefono" required pattern="[0-9]{10,}">
+                </div>
+                <div class="form-group">
+                  <label for="email">Correo electrónico *</label>
+                  <input type="email" id="email" name="email" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="direccion_estado">Estado *</label>
+                <select id="direccion_estado" name="direccion_estado" required>
+                  <option value="">Selecciona un estado</option>
+                  <option value="Baja California">Baja California</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="direccion_ciudad">Ciudad *</label>
+                  <select id="direccion_ciudad" name="direccion_ciudad" required>
+                    <option value="">Selecciona una ciudad</option>
+                    <option value="Tijuana">Tijuana</option>
+                    <option value="Ensenada">Ensenada</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="direccion_colonia">Colonia *</label>
+                  <input type="text" id="direccion_colonia" name="direccion_colonia" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="direccion_calle">Calle *</label>
+                  <input type="text" id="direccion_calle" name="direccion_calle" required>
+                </div>
+                <div class="form-group">
+                  <label for="direccion_numero">Número *</label>
+                  <input type="text" id="direccion_numero" name="direccion_numero" required>
+                </div>
+                <div class="form-group">
+                  <label for="direccion_numero_int">Número interior</label>
+                  <input type="text" id="direccion_numero_int" name="direccion_numero_int">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Servicio *</label>
+                <select id="servicio" name="servicio" required>
+                  <option value="">Selecciona un servicio</option>
+                  <option value="estimacion">Estimación de valor</option>
+                  <option value="avaluo">Avalúo</option>
+                  <option value="inspeccion">Inspección de propiedad</option>
+                  <option value="planos">Planos/levantamiento arquitectónico</option>
+                </select>
+              </div>
+              <div class="form-group" id="uso_avaluo_group" style="display:none;">
+                <label for="uso_avaluo">Uso del avalúo *</label>
+                <select id="uso_avaluo" name="uso_avaluo">
+                  <option value="">Selecciona el uso</option>
+                  <option value="fiscal">Fiscal</option>
+                  <option value="comercial">Comercial/Privado</option>
+                </select>
+                <div id="ensenada_notice" class="ensenada-notice">
+                  ⚠️ <strong>Nota:</strong> Para propiedades en Ensenada, los avalúos comerciales/privados no pueden ser certificados por el municipio.
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Tipo de propiedad *</label>
+                <select id="tipo_propiedad" name="tipo_propiedad" required>
+                  <option value="">Selecciona el tipo</option>
+                  <option value="terreno">Terreno</option>
+                  <option value="casa">Casa</option>
+                  <option value="departamento">Departamento</option>
+                  <option value="comercio">Comercio</option>
+                  <option value="industrial">Industrial</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <div class="form-group" id="m2_terreno_group">
+                  <label for="m2_terreno">Metros cuadrados de terreno</label>
+                  <input type="text" id="m2_terreno" name="m2_terreno" class="input-bold" style="width: 80px; min-width: 60px;">
+                  <span style="margin-left:4px;">m²</span>
+                </div>
+                <div class="form-group" id="m2_construccion_group">
+                  <label for="m2_construccion">Metros cuadrados de construcción</label>
+                  <input type="text" id="m2_construccion" name="m2_construccion" class="input-bold" style="width: 80px; min-width: 60px;">
+                  <span style="margin-left:4px;">m²</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="notas">Notas adicionales</label>
+                <textarea id="notas" name="notas" rows="2" style="width:100%;"></textarea>
+              </div>
+              <div class="form-group" style="text-align:center; margin-top:1.5em;">
+                <button type="submit" class="submit-btn-bold">
+                  <span>OBTENER MI COTIZACIÓN</span>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M7 17L17 7M17 7H8M17 7V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-bold">
+      <div class="container-bold">
+        <div class="footer-content">
+          <div class="footer-brand">
+            <p>Valor sin complicaciones</p>
+          </div>
+          <div class="footer-contact">
+            <h4>Contacto</h4>
+            <p>📧 contacto.valura@gmail.com</p>
+            <p>📞 +52 646 384 3985</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // --- ELEMENTOS DEL DOM ---
+    const form = document.getElementById('cotizacionForm');
+    const servicio = document.getElementById('servicio');
+    const tipoPropiedad = document.getElementById('tipo_propiedad');
+    const direccionCiudad = document.getElementById('direccion_ciudad');
+    const usoAvaluoGroup = document.getElementById('uso_avaluo_group');
+    const usoAvaluo = document.getElementById('uso_avaluo');
+    const m2ConstruccionGroup = document.getElementById('m2_construccion_group');
+    const ensenadaNotice = document.getElementById('ensenada_notice');
+
+    // Opciones a manipular dinámicamente
+    const terrenoOption = tipoPropiedad.querySelector('option[value="terreno"]');
+
+    // --- FUNCIONES DE LÓGICA ---
+    function updateFormLogic() {
+      const servicioValue = servicio.value;
+      const ciudadValue = direccionCiudad.value;
+      const usoAvaluoValue = usoAvaluo.value;
+      const esAvaluo = servicioValue === 'avaluo';
+      usoAvaluoGroup.style.display = esAvaluo ? '' : 'none';
+      if (esAvaluo) {
+        usoAvaluo.setAttribute('required', 'required');
+      } else {
+        usoAvaluo.removeAttribute('required');
+      }
+      const esEnsenada = ciudadValue === 'Ensenada';
+      const esComercial = usoAvaluoValue === 'comercial';
+      if (esAvaluo && esEnsenada && esComercial) {
+        ensenadaNotice.style.display = 'block';
+      } else {
+        ensenadaNotice.style.display = 'none';
+      }
+      const esPlanos = servicioValue === 'planos';
+      if (esPlanos) {
+        terrenoOption.style.display = 'none';
+        if (tipoPropiedad.value === 'terreno') {
+          tipoPropiedad.value = '';
+        }
+      } else {
+        terrenoOption.style.display = '';
+      }
+    }
+    function toggleConstruccion() {
+      if (tipoPropiedad.value === 'terreno') {
+        m2ConstruccionGroup.style.display = 'none';
+        document.getElementById('m2_construccion').value = '';
+      } else {
+        m2ConstruccionGroup.style.display = '';
+      }
+    }
+    servicio.addEventListener('change', updateFormLogic);
+    direccionCiudad.addEventListener('change', updateFormLogic);
+    usoAvaluo.addEventListener('change', updateFormLogic);
+    tipoPropiedad.addEventListener('change', toggleConstruccion);
+
+    // --- VALIDACIÓN DEL FORMULARIO ---
+    form.addEventListener('submit', function (e) {
+      const requiredInputs = form.querySelectorAll('[required]');
+      let valid = true;
+      requiredInputs.forEach(input => {
+        if (input.offsetParent !== null && !input.value.trim()) {
+          valid = false;
+        }
+      });
+      if (!valid) {
+        alert('Por favor, completa todos los campos obligatorios.');
+        e.preventDefault();
+        return;
+      }
+      e.preventDefault();
+      // Prepare form data
+      const formData = {};
+      Array.from(form.elements).forEach(el => {
+        if (el.name && el.value !== undefined) {
+          formData[el.name] = el.value;
+        }
+      });
+      const submitBtn = form.querySelector('.submit-btn-bold span');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'ENVIANDO...';
+      // Detectar entorno y elegir URL
+      let apiUrl;
+      apiUrl = 'http://valura-mail:3015/api/cotizacion';
+
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('¡Cotización enviada correctamente! Revisa tu correo para la confirmación.');
+          form.reset();
+        } else {
+          alert('Hubo un error al enviar la cotización. Inténtalo de nuevo más tarde.');
+        }
+        submitBtn.textContent = originalText;
+      })
+      .catch(() => {
+        alert('Hubo un error de conexión. Inténtalo de nuevo más tarde.');
+        submitBtn.textContent = originalText;
+      });
+    });
+    updateFormLogic();
+    toggleConstruccion();
+  });
+</script>
+
+</body>
+</html>
