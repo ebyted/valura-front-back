@@ -1,54 +1,55 @@
- services:
-    traefik:
-      services:
-        traefik:
-          image: traefik:v2.10
-          command:
-            - "--api.dashboard=true"
-            - "--api.insecure=true" # Solo para pruebas, no recomendado en producción
-            - "--providers.docker=true"
-            - "--entrypoints.web.address=:80"
-            - "--entrypoints.websecure.address=:443"
-          ports:
-            - "80:80"
-            - "443:443"
-            - "8080:8080" # Puerto del dashboard
-          networks:
-            - dokploy-network
-          volumes:
-            - /var/run/docker.sock:/var/run/docker.sock
-          restart: unless-stopped
+services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=true" # Solo para pruebas, no recomendado en producción
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080" # Puerto del dashboard
+    networks:
+      - dokploy-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
 
-        valura-mail:
-          build: ./backend # Directory containing your Node.js Dockerfile
-          ports:
-            - "3015:3015" # Map container port 3015 to host port 3015
-          expose:
-            - "3015" # Explicitly expose port 3015 within the Docker network
-          container_name: valura-mail # Optional: give it a specific container name
-          labels:
-            - "traefik.http.middlewares.cors.headers.accessControlAllowOriginList=https://valura.mx,https://www.valura.mx"
-            - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=POST,OPTIONS"
-            - "traefik.http.middlewares.cors.headers.accessControlAllowHeaders=Content-Type,Accept"
-            - "traefik.http.routers.mail-sender.middlewares=cors@docker"
-            - "traefik.http.routers.mail-sender.rule=PathPrefix(/api/cotizacion)"
-            - "traefik.http.routers.mail-sender.entrypoints=websecure"
-            - "traefik.http.routers.mail-sender.tls=true"
-          networks:
-            - dokploy-network
+  valura-mail:
+    build: ./backend # Directory containing your Node.js Dockerfile
+    ports:
+      - "3015:3015" # Map container port 3015 to host port 3015
+    expose:
+      - "3015" # Explicitly expose port 3015 within the Docker network
+    container_name: valura-mail # Optional: give it a specific container name
+    labels:
+      - "traefik.http.middlewares.cors.headers.accessControlAllowOriginList=https://valura.mx,https://www.valura.mx"
+      - "traefik.http.middlewares.cors.headers.accessControlAllowMethods=POST,OPTIONS"
+      - "traefik.http.middlewares.cors.headers.accessControlAllowHeaders=Content-Type,Accept"
+      - "traefik.http.routers.mail-sender.middlewares=cors@docker"
+      - "traefik.http.routers.mail-sender.rule=PathPrefix(/api/cotizacion)"
+      - "traefik.http.routers.mail-sender.entrypoints=websecure"
+      - "traefik.http.routers.mail-sender.tls=true"
+    networks:
+      - dokploy-network
 
-        valura-homepage:
-          build: ./frontend # Directory containing your Apache Dockerfile
-          #ports:
-          #- "8080:80" # Map container port 80 to host port 8080
-          labels:
-            - traefik.enable=true
-            - traefik.docker.network=dokploy-network
-            - traefik.http.services.valura.loadbalancer.server.port=80
-            - traefik.http.routers.valura.rule=Host(`valura.mx`) || Host(`www.valura.mx`)
-            - traefik.http.routers.valura.entrypoints=websecure
-            - traefik.http.routers.valura.tls=true
-            - traefik.http.routers.valura.tls.certresolver=letsencrypt
-          networks:
-            - dokploy-network
+  valura-homepage:
+    build: ./frontend # Directory containing your Apache Dockerfile
+    #ports:
+    #- "8080:80" # Map container port 80 to host port 8080
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=dokploy-network
+      - traefik.http.services.valura.loadbalancer.server.port=80
+      - traefik.http.routers.valura.rule=Host(`valura.mx`) || Host(`www.valura.mx`)
+      - traefik.http.routers.valura.entrypoints=websecure
+      - traefik.http.routers.valura.tls=true
+      - traefik.http.routers.valura.tls.certresolver=letsencrypt
+    networks:
+      - dokploy-network
+
+networks:
+  dokploy-network:
     driver: bridge
