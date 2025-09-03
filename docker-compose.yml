@@ -18,7 +18,7 @@ services:
       - dokploy-network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-  - ./letsencrypt:/letsencrypt
+      - ./letsencrypt:/letsencrypt
     restart: unless-stopped
 
   valura-mail:
