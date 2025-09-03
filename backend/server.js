@@ -10,6 +10,8 @@ const port = process.env.PORT || 3015;
 // ===== CORS (ANTES que bodyParser) =====
 const WHITELIST = new Set([
   'http://valura-homepage:80',
+  'https://www.valura.mx',
+  'https://valura.mx',
 ]);
 
 const corsOptions = {
