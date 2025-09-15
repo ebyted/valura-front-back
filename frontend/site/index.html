@@ -1069,20 +1069,68 @@
         },
         body: JSON.stringify(formData)
       })
-      .then(response => {
+      .then(async response => {
+        submitBtn.textContent = originalText;
         if (response.ok) {
-          alert('¡Cotización enviada correctamente! Revisa tu correo para la confirmación.');
+          const data = await response.json();
+          // Mostrar resultado en el frontend
+          mostrarResultadoCotizacion(data);
           form.reset();
         } else {
           alert('Hubo un error al enviar la cotización. Inténtalo de nuevo más tarde.');
         }
-        submitBtn.textContent = originalText;
       })
       .catch(() => {
         alert('Hubo un error de conexión. Inténtalo de nuevo más tarde.');
         submitBtn.textContent = originalText;
       });
     });
+
+    // Crear contenedor para mostrar el resultado si no existe
+    let resultadoDiv = document.getElementById('resultado-cotizacion');
+    if (!resultadoDiv) {
+      resultadoDiv = document.createElement('div');
+      resultadoDiv.id = 'resultado-cotizacion';
+      resultadoDiv.style.maxWidth = '600px';
+      resultadoDiv.style.margin = '2em auto';
+      resultadoDiv.style.padding = '1.5em';
+      resultadoDiv.style.background = '#e6f3fa';
+      resultadoDiv.style.border = '2px solid #0097a7';
+      resultadoDiv.style.borderRadius = '12px';
+      resultadoDiv.style.boxShadow = '0 4px 16px rgba(0,0,0,0.07)';
+      resultadoDiv.style.display = 'none';
+      form.parentNode.insertBefore(resultadoDiv, form);
+    }
+
+    function mostrarResultadoCotizacion(data) {
+      if (!data || !data.ok) {
+        alert('No se pudo obtener la cotización.');
+        return;
+      }
+      let lineas = '';
+      if (data.salida && Array.isArray(data.salida.lineas)) {
+        lineas = '<ul style="margin:0 0 12px 18px;padding:0;">' + data.salida.lineas.map(txt => `<li>${txt}</li>`).join('') + '</ul>';
+      }
+      resultadoDiv.innerHTML = `
+        <h2 style="color:#005baa;text-align:center;">¡Cotización enviada!</h2>
+        <p style="margin:0 0 8px 0;">Folio: <strong>${data.quote_id || ''}</strong></p>
+        <p>Revisa tu correo para la confirmación.<br>Si deseas confirmar el servicio, puedes hacerlo por WhatsApp:</p>
+        <div style="text-align:center;margin:16px 0 6px;">
+          <a href="${data.whatsapp_confirm_url || '#'}" target="_blank" rel="noopener" style="background:#25D366;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;font-weight:600;display:inline-block;">Confirmar por WhatsApp</a>
+        </div>
+        <hr style="margin:16px 0;">
+        <p><strong>Desglose estimado:</strong></p>
+        ${lineas}
+        <table style="width:100%;border-collapse:collapse;">
+          <tr><td style="padding:6px 0;">Subtotal</td><td style="padding:6px 0;text-align:right;font-weight:600;">${data.salida?.subtotal || ''}</td></tr>
+          <tr><td style="padding:6px 0;">IVA (16%)</td><td style="padding:6px 0;text-align:right;font-weight:600;">${data.salida?.iva || ''}</td></tr>
+          <tr><td style="padding:6px 0;border-top:1px solid #e0eaf1;">Total</td><td style="padding:6px 0;text-align:right;font-weight:800;color:#d32f2f;border-top:1px solid #e0eaf1;">${data.salida?.total || ''}</td></tr>
+        </table>
+        <p style="font-size: 0.9em; color: #555; text-align: center;">Gracias por confiar en Valura.mx</p>
+      `;
+      resultadoDiv.style.display = 'block';
+      resultadoDiv.scrollIntoView({ behavior: 'smooth' });
+    }
     updateFormLogic();
     toggleConstruccion();
   });
