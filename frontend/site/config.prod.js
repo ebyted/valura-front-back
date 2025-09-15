@@ -1,0 +1,1 @@
+window.API_URL = "https://www.valura.mx:3015/api/cotizacion";

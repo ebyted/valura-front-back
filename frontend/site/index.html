@@ -7,6 +7,16 @@
   <!-- Importa Outfit e Inter desde Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family:Inter:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/style-bold.css">
+  <script>
+    // Carga automática de config según entorno
+    (function() {
+      var prodHosts = ["valura.mx", "www.valura.mx"];
+      var isProd = prodHosts.some(function(h) { return location.hostname.includes(h); });
+      var configScript = document.createElement('script');
+      configScript.src = isProd ? 'config.prod.js' : 'config.dev.js';
+      document.head.appendChild(configScript);
+    })();
+  </script>
   <style>
     /* Mejor visibilidad y alineación para el bloque extra */
     .quote-extra-info.destacado {
@@ -1059,8 +1069,8 @@
       const originalText = submitBtn.textContent;
       submitBtn.textContent = 'ENVIANDO...';
       // Detectar entorno y elegir URL
-      let apiUrl;
-      apiUrl = 'https://www.valura.mx:3015/api/cotizacion';
+
+  let apiUrl = window.API_URL || 'https://www.valura.mx:3015/api/cotizacion';
 
       fetch(apiUrl, {
         method: 'POST',
