@@ -1,1 +1,1 @@
-window.API_URL = "http://localhost:3015/api/cotizacion";
+window.API_URL = "http://localhost:7099/api/cotizacion";

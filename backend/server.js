@@ -8,7 +8,7 @@ const crypto = require('crypto');
 const { cotizar, SERVICIOS } = require('./cotizador');
 
 const app = express();
-const port = process.env.PORT || 3015;
+const port = process.env.PORT || 7099;
 
 /* ------------------------ SMTP (Gmail u otro) ------------------------ */
 const transporter = nodemailer.createTransport({
@@ -76,6 +76,7 @@ app.use(cors({
     'http://localhost:3015',
     'http://localhost:8080',
     'http://127.0.0.1:8080',
+    'http://localhost:3000',
     'https://valura.mx',
     'https://www.valura.mx',
     'http://valura-homepage'
