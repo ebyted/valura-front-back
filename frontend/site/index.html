@@ -1121,6 +1121,14 @@
       if (data.salida && Array.isArray(data.salida.lineas)) {
         lineas = '<ul style="margin:0 0 12px 18px;padding:0;">' + data.salida.lineas.map(txt => `<li>${txt}</li>`).join('') + '</ul>';
       }
+
+      // Variables para el desglose
+      let subtotal = parseFloat(data.salida?.subtotal?.replace(/[^\d.]/g, '') || 0);
+      let iva = parseFloat(data.salida?.iva?.replace(/[^\d.]/g, '') || 0);
+      let total = parseFloat(data.salida?.total?.replace(/[^\d.]/g, '') || 0);
+      let moneda = (data.salida?.total || '').includes('$') ? '$' : '';
+
+      // HTML principal
       resultadoDiv.innerHTML = `
         <h2 style="color:#005baa;text-align:center;">¡Cotización enviada!</h2>
         <p style="margin:0 0 8px 0;">Folio: <strong>${data.quote_id || ''}</strong></p>
@@ -1131,15 +1139,30 @@
         <hr style="margin:16px 0;">
         <p><strong>Desglose estimado:</strong></p>
         ${lineas}
-        <table style="width:100%;border-collapse:collapse;">
-          <tr><td style="padding:6px 0;">Subtotal</td><td style="padding:6px 0;text-align:right;font-weight:600;">${data.salida?.subtotal || ''}</td></tr>
-          <tr><td style="padding:6px 0;">IVA (16%)</td><td style="padding:6px 0;text-align:right;font-weight:600;">${data.salida?.iva || ''}</td></tr>
-          <tr><td style="padding:6px 0;border-top:1px solid #e0eaf1;">Total</td><td style="padding:6px 0;text-align:right;font-weight:800;color:#d32f2f;border-top:1px solid #e0eaf1;">${data.salida?.total || ''}</td></tr>
+        <table id="tabla-desglose" style="width:100%;border-collapse:collapse;">
+          <tr><td style="padding:6px 0;">Subtotal</td><td id="subtotal-celda" style="padding:6px 0;text-align:right;font-weight:600;">${moneda}${subtotal.toLocaleString('es-MX', {minimumFractionDigits:2})}</td></tr>
+          <tr><td style="padding:6px 0;">IVA (16%)</td><td id="iva-celda" style="padding:6px 0;text-align:right;font-weight:600;">${moneda}${iva.toLocaleString('es-MX', {minimumFractionDigits:2})}</td></tr>
+          <tr><td style="padding:6px 0;border-top:1px solid #e0eaf1;">Total</td><td id="total-celda" style="padding:6px 0;text-align:right;font-weight:800;color:#d32f2f;border-top:1px solid #e0eaf1;">${moneda}${total.toLocaleString('es-MX', {minimumFractionDigits:2})}</td></tr>
         </table>
+        <div style="margin:1em 0 0 0;text-align:left;">
+          <label style="display:flex;align-items:center;gap:0.5em;font-size:1.08em;">
+            <input type="checkbox" id="sello-ayuntamiento-checkbox" style="width:1.2em;height:1.2em;">
+            <span>Sello del ayuntamiento <span style="color:#0097a7;font-weight:600;">(+ $1,500.00)</span></span>
+          </label>
+        </div>
         <p style="font-size: 0.9em; color: #555; text-align: center;">Gracias por confiar en Valura.mx</p>
       `;
       resultadoDiv.style.display = 'block';
       resultadoDiv.scrollIntoView({ behavior: 'smooth' });
+
+      // Lógica para el checkbox
+      const checkbox = document.getElementById('sello-ayuntamiento-checkbox');
+      const totalCelda = document.getElementById('total-celda');
+      checkbox.addEventListener('change', function() {
+        let extra = checkbox.checked ? 1500 : 0;
+        let nuevoTotal = total + extra;
+        totalCelda.textContent = `${moneda}${nuevoTotal.toLocaleString('es-MX', {minimumFractionDigits:2})}`;
+      });
     }
     updateFormLogic();
     toggleConstruccion();
