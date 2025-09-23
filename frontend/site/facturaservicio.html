@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Facturación de Servicio | Valura</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style-bold.css">
+  <style>
+    body {
+      font-family: 'Outfit', 'Inter', Arial, sans-serif;
+      background: #f7fafc;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+    .page-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+      padding: 0 0 2em 0;
+    }
+    .factura-header {
+      background: linear-gradient(90deg, #e6f3fa 0%, #d2f4ea 100%);
+      border-bottom: 2px solid #0097a7;
+      border-radius: 16px 16px 0 0;
+      padding: 2em 1em 1em 1em;
+      text-align: center;
+    }
+    .factura-title {
+      font-size: 2em;
+      font-weight: 700;
+      color: #0097a7;
+      margin-bottom: 0.5em;
+    }
+    .factura-desc {
+      font-size: 1.1em;
+      color: #555;
+      margin-bottom: 1em;
+    }
+    .factura-form {
+      max-width: 480px;
+      margin: 2em auto 0 auto;
+      background: #e6f3fa;
+      border: 2px solid #0097a7;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+      padding: 2em 1.5em;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2em;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+    }
+    label {
+      font-weight: 600;
+      color: #005baa;
+      font-size: 1em;
+    }
+    input, select, textarea {
+      font-family: inherit;
+      font-size: 1em;
+      padding: 0.7em;
+      border-radius: 6px;
+      border: 1px solid #b3e5fc;
+      background: #fff;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #0097a7;
+      outline: none;
+    }
+    .submit-btn-bold {
+      background: #0097a7;
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      padding: 0.9em 1.5em;
+      font-size: 1.1em;
+      cursor: pointer;
+      margin-top: 1em;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5em;
+    }
+    .submit-btn-bold:hover {
+      background: #00796b;
+    }
+    @media (max-width: 600px) {
+      .page-container {
+        border-radius: 0;
+        box-shadow: none;
+        padding: 0;
+      }
+      .factura-form {
+        padding: 1em 0.5em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <div class="factura-header">
+      <h1 class="factura-title">Facturación de Servicio</h1>
+      <p class="factura-desc">Completa los datos fiscales para recibir tu factura electrónica CFDI.</p>
+    </div>
+    <form class="factura-form" id="facturaForm" autocomplete="off">
+      <div class="form-group">
+        <label for="rfc">RFC *</label>
+        <input type="text" id="rfc" name="rfc" maxlength="13" required placeholder="Ej. XAXX010101000">
+      </div>
+      <div class="form-group">
+        <label for="razon_social">Nombre o Razón Social *</label>
+        <input type="text" id="razon_social" name="razon_social" required placeholder="Nombre completo o empresa">
+      </div>
+      <div class="form-group">
+        <label for="correo">Correo electrónico para factura *</label>
+        <input type="email" id="correo" name="correo" required placeholder="tucorreo@dominio.com">
+      </div>
+      <div class="form-group">
+        <label for="uso_cfdi">Uso de CFDI *</label>
+        <select id="uso_cfdi" name="uso_cfdi" required>
+          <option value="">Selecciona el uso</option>
+          <option value="G03">G03 - Gastos en general</option>
+          <option value="P01">P01 - Por definir</option>
+          <option value="D01">D01 - Honorarios médicos</option>
+          <option value="I04">I04 - Equipo de computo</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="domicilio">Domicilio fiscal *</label>
+        <textarea id="domicilio" name="domicilio" rows="2" required placeholder="Calle, número, colonia, ciudad, estado, CP"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="telefono">Teléfono de contacto</label>
+        <input type="tel" id="telefono" name="telefono" pattern="[0-9]{10,}" placeholder="Ej. 6463843985">
+      </div>
+      <button type="submit" class="submit-btn-bold">
+        <span>Solicitar factura</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M7 17L17 7M17 7H8M17 7V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </form>
+    <div id="factura-result" style="max-width:480px;margin:2em auto 0 auto;"></div>
+  </div>
+  <script>
+    // Prellenar teléfono y correo si existen en localStorage
+    window.addEventListener('DOMContentLoaded', function() {
+      try {
+        const telefono = localStorage.getItem('telefono');
+        const correo = localStorage.getItem('email');
+        if (telefono) document.getElementById('telefono').value = telefono;
+        if (correo) document.getElementById('correo').value = correo;
+      } catch(e) {}
+    });
+
+    document.getElementById('facturaForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const resultDiv = document.getElementById('factura-result');
+      const formData = {};
+      Array.from(form.elements).forEach(el => {
+        if (el.name && el.value !== undefined) {
+          formData[el.name] = el.value;
+        }
+      });
+      // Enviar datos al backend para facturación
+      fetch('/api/factura', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+      .then(async response => {
+        if (response.ok) {
+          resultDiv.innerHTML = `<div style='background:#e8f5e9;border:2px solid #0097a7;border-radius:10px;padding:1.5em;text-align:center;color:#2e7d32;font-weight:600;'>¡Datos enviados! Pronto recibirás tu factura en el correo proporcionado.</div>`;
+          form.reset();
+        } else {
+          resultDiv.innerHTML = `<div style='background:#ffeaea;border:2px solid #d32f2f;border-radius:10px;padding:1.5em;text-align:center;color:#d32f2f;font-weight:600;'>Hubo un error al enviar la solicitud. Intenta de nuevo más tarde.</div>`;
+        }
+      })
+      .catch(() => {
+        resultDiv.innerHTML = `<div style='background:#ffeaea;border:2px solid #d32f2f;border-radius:10px;padding:1.5em;text-align:center;color:#d32f2f;font-weight:600;'>Error de conexión. Intenta de nuevo más tarde.</div>`;
+      });
+    });
+  </script>
+</body>
+</html>

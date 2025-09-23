@@ -1001,6 +1001,10 @@
     // Opciones a manipular dinámicamente
     const terrenoOption = tipoPropiedad.querySelector('option[value="terreno"]');
 
+  // Elementos para ocultar el formulario y botón
+  const quoteFormContainer = document.querySelector('.quote-form-container');
+  const obtenerCotizacionBtn = form.querySelector('.submit-btn-bold');
+
     // --- FUNCIONES DE LÓGICA ---
     function updateFormLogic() {
       const servicioValue = servicio.value;
@@ -1065,12 +1069,21 @@
           formData[el.name] = el.value;
         }
       });
+
+      // Guardar teléfono y correo en localStorage para facturación
+      if (formData.telefono) {
+        localStorage.setItem('telefono', formData.telefono);
+      }
+      if (formData.email) {
+        localStorage.setItem('email', formData.email);
+      }
+
       const submitBtn = form.querySelector('.submit-btn-bold span');
       const originalText = submitBtn.textContent;
       submitBtn.textContent = 'ENVIANDO...';
       // Detectar entorno y elegir URL
 
-  let apiUrl = window.API_URL || 'https://www.valura.mx:7099/api/cotizacion';
+      let apiUrl = window.API_URL || 'https://www.valura.mx:7099/api/cotizacion';
 
       fetch(apiUrl, {
         method: 'POST',
@@ -1111,6 +1124,9 @@
       resultadoDiv.style.display = 'none';
       form.parentNode.insertBefore(resultadoDiv, form);
     }
+  // Al recargar la página, la sección de cotización debe estar visible
+  if (quoteFormContainer) quoteFormContainer.style.display = '';
+  if (obtenerCotizacionBtn) obtenerCotizacionBtn.style.display = '';
 
     function mostrarResultadoCotizacion(data) {
       if (!data || !data.ok) {
@@ -1132,22 +1148,23 @@
       resultadoDiv.innerHTML = `
         <h2 style="color:#005baa;text-align:center;">¡Cotización enviada!</h2>
         <p style="margin:0 0 8px 0;">Folio: <strong>${data.quote_id || ''}</strong></p>
-        <p>Revisa tu correo para la confirmación.<br>Si deseas confirmar el servicio, puedes hacerlo por WhatsApp:</p>
-        <div style="text-align:center;margin:16px 0 6px;">
-          <a href="${data.whatsapp_confirm_url || '#'}" target="_blank" rel="noopener" style="background:#25D366;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;font-weight:600;display:inline-block;">Confirmar por WhatsApp</a>
-        </div>
+        <p>Revisa tu correo para la confirmación.</p>
         <hr style="margin:16px 0;">
         <p><strong>Desglose estimado:</strong></p>
         ${lineas}
         <table id="tabla-desglose" style="width:100%;border-collapse:collapse;">
           <tr><td style="padding:6px 0;">Subtotal</td><td id="subtotal-celda" style="padding:6px 0;text-align:right;font-weight:600;">${moneda}${subtotal.toLocaleString('es-MX', {minimumFractionDigits:2})}</td></tr>
-          <tr><td style="padding:6px 0;">IVA (16%)</td><td id="iva-celda" style="padding:6px 0;text-align:right;font-weight:600;">${moneda}${iva.toLocaleString('es-MX', {minimumFractionDigits:2})}</td></tr>
+          <tr><td style="padding:6px 0;">IVA (8%)</td><td id="iva-celda" style="padding:6px 0;text-align:right;font-weight:600;">${moneda}${iva.toLocaleString('es-MX', {minimumFractionDigits:2})}</td></tr>
           <tr><td style="padding:6px 0;border-top:1px solid #e0eaf1;">Total</td><td id="total-celda" style="padding:6px 0;text-align:right;font-weight:800;color:#d32f2f;border-top:1px solid #e0eaf1;">${moneda}${total.toLocaleString('es-MX', {minimumFractionDigits:2})}</td></tr>
         </table>
-        <div style="margin:1em 0 0 0;text-align:left;">
+        <div style="margin:1em 0 0 0;text-align:left;display:flex;flex-direction:column;gap:0.7em;">
           <label style="display:flex;align-items:center;gap:0.5em;font-size:1.08em;">
             <input type="checkbox" id="sello-ayuntamiento-checkbox" style="width:1.2em;height:1.2em;">
             <span>Sello del ayuntamiento <span style="color:#0097a7;font-weight:600;">(+ $1,500.00)</span></span>
+          </label>
+          <label style="display:flex;align-items:center;gap:0.5em;font-size:1.08em;">
+            <input type="checkbox" id="facturar-checkbox" style="width:1.2em;height:1.2em;">
+            <span>Aceptar y facturar <span style="color:#0097a7;font-weight:600;">(Recibe factura electrónica)</span></span>
           </label>
         </div>
         <p style="font-size: 0.9em; color: #555; text-align: center;">Gracias por confiar en Valura.mx</p>
@@ -1162,6 +1179,14 @@
         let extra = checkbox.checked ? 1500 : 0;
         let nuevoTotal = total + extra;
         totalCelda.textContent = `${moneda}${nuevoTotal.toLocaleString('es-MX', {minimumFractionDigits:2})}`;
+      });
+
+      // Lógica para el checkbox de facturación
+      const facturarCheckbox = document.getElementById('facturar-checkbox');
+      facturarCheckbox.addEventListener('change', function() {
+        if (facturarCheckbox.checked) {
+          window.location.href = 'facturaservicio.html';
+        }
       });
     }
     updateFormLogic();

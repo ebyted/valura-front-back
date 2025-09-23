@@ -87,6 +87,51 @@ app.use(cors({
 }));
 
 /* ------------------------------- Rutas -------------------------------- */
+app.post('/api/factura', async (req, res) => {
+  try {
+    const data = req.body || {};
+    // Validación básica
+    if (!data.rfc || !data.razon_social || !data.correo || !data.uso_cfdi || !data.domicilio) {
+      return res.status(400).json({ ok: false, error: 'Faltan datos obligatorios para facturación.' });
+    }
+
+    // Construir el cuerpo del correo
+    const facturaHtml = `
+      <div style="font-family: Arial, sans-serif; color: #222; max-width: 600px; margin: auto;">
+        <h2 style="color: #005baa; text-align: center;">Solicitud de Factura – Valura</h2>
+        <p>Se ha recibido una solicitud de factura electrónica CFDI con los siguientes datos:</p>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+          <tr><td style="padding:6px 0;font-weight:bold;">RFC:</td><td style="padding:6px 0;">${data.rfc}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Nombre/Razón Social:</td><td style="padding:6px 0;">${data.razon_social}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Correo electrónico:</td><td style="padding:6px 0;">${data.correo}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Uso de CFDI:</td><td style="padding:6px 0;">${data.uso_cfdi}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Domicilio fiscal:</td><td style="padding:6px 0;">${data.domicilio}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Teléfono:</td><td style="padding:6px 0;">${data.telefono || 'No especificado'}</td></tr>
+        </table>
+        <p style="font-size: 0.95em; color: #555;">Por favor, procesa la factura y envíala al correo proporcionado.</p>
+        <p style="font-size: 0.9em; color: #555; text-align: center;">Valura.mx</p>
+      </div>
+    `;
+
+    // Enviar correo a contacto.valura@gmail.com y al cliente
+    const destinatarios = [data.correo, process.env.SALES_EMAIL || 'contacto.valura@gmail.com']
+      .filter(Boolean)
+      .join(',');
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: destinatarios,
+      replyTo: process.env.SALES_EMAIL || process.env.EMAIL_USER,
+      subject: `Solicitud de factura CFDI | Valura.mx`,
+      html: facturaHtml
+    };
+    await transporter.sendMail(mailOptions);
+
+    return res.json({ ok: true });
+  } catch (error) {
+    console.error('Error en /api/factura:', error);
+    return res.status(400).json({ ok: false, error: error.message || 'Error al enviar la solicitud de factura' });
+  }
+});
 app.get('/api/hola', (req, res) => {
   res.json({ mensaje: 'Hola mundo' });
 });
@@ -103,7 +148,16 @@ app.post('/api/cotizacion', async (req, res) => {
       factor_servicio: Number(formData.factor_servicio) || 15000
     };
 
+    // Calcular cotización y ajustar IVA al 8%
     const resultado = cotizar(params);
+    if (resultado && resultado.salida) {
+      // Recalcular IVA y total con 8%
+      let subtotalNum = parseFloat(resultado.salida.subtotal?.replace(/[^\d.]/g, '') || 0);
+      let ivaNum = +(subtotalNum * 0.08).toFixed(2);
+      resultado.salida.iva = `$${ivaNum.toLocaleString('es-MX', {minimumFractionDigits:2})}`;
+      let totalNum = subtotalNum + ivaNum;
+      resultado.salida.total = `$${totalNum.toLocaleString('es-MX', {minimumFractionDigits:2})}`;
+    }
 
     // --- ID corto de cotización y link de WhatsApp ---
     const quoteId = (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)).slice(0, 8);
@@ -121,6 +175,7 @@ app.post('/api/cotizacion', async (req, res) => {
       .map(txt => `<li>${txt}</li>`)
       .join('');
 
+
     const confirmationTemplate = `
       <div style="font-family: Arial, sans-serif; color: #222; max-width: 600px; margin: auto;">
         <h2 style="color: #005baa; text-align: center;">Tu cotización – Valura</h2>
@@ -131,16 +186,9 @@ app.post('/api/cotizacion', async (req, res) => {
         <ul style="margin:0 0 12px 18px;padding:0;">${lineasHtml}</ul>
         <table style="width:100%;border-collapse:collapse;">
           <tr><td style="padding:6px 0;">Subtotal</td><td style="padding:6px 0;text-align:right;font-weight:600;">${resultado.salida.subtotal}</td></tr>
-          <tr><td style="padding:6px 0;">IVA (16%)</td><td style="padding:6px 0;text-align:right;font-weight:600;">${resultado.salida.iva}</td></tr>
+          <tr><td style="padding:6px 0;">IVA (8%)</td><td style="padding:6px 0;text-align:right;font-weight:600;">${resultado.salida.iva}</td></tr>
           <tr><td style="padding:6px 0;border-top:1px solid #e0eaf1;">Total</td><td style="padding:6px 0;text-align:right;font-weight:800;color:#d32f2f;border-top:1px solid #e0eaf1;">${resultado.salida.total}</td></tr>
         </table>
-
-        <div style="text-align:center;margin:16px 0 6px;">
-          <a href="${waUrl}" target="_blank" rel="noopener"
-             style="background:#25D366;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none;font-weight:600;display:inline-block;">
-            Confirmar servicio por WhatsApp
-          </a>
-        </div>
 
         <hr style="margin:16px 0;">
         <p style="margin:0 0 8px 0;"><strong>Datos capturados</strong></p>
@@ -155,7 +203,7 @@ app.post('/api/cotizacion', async (req, res) => {
             <tr><td style="padding:6px 0;font-weight:bold;">Notas:</td><td style="padding:6px 0;">${formData.notas || 'Sin notas'}</td></tr>
           </tbody>
         </table>
-        <p style="margin-top:16px;">Si deseas continuar, responde este correo o usa el botón de WhatsApp para agendar tu visita técnica.</p>
+        <p style="margin-top:16px;">Si deseas continuar, responde este correo para agendar tu visita técnica.</p>
         <p style="font-size: 0.9em; color: #555; text-align: center;">Claridad, valor y forma en Valura.mx</p>
       </div>
     `;
