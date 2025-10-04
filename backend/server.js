@@ -82,7 +82,7 @@ app.use(cors({
     'http://valura-homepage'
   ],
   methods: ['POST', 'OPTIONS', 'GET'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-preview'],
   optionsSuccessStatus: 204
 }));
 

@@ -1081,14 +1081,14 @@
       const submitBtn = form.querySelector('.submit-btn-bold span');
       const originalText = submitBtn.textContent;
       submitBtn.textContent = 'ENVIANDO...';
-      // Detectar entorno y elegir URL
 
+      // Solo mostrar desglose, NO enviar correo aún
       let apiUrl = window.API_URL || 'https://www.valura.mx:7099/api/cotizacion';
-
       fetch(apiUrl, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-Preview': '1' // Header especial para que backend NO envíe correo (opcional, si backend lo soporta)
         },
         body: JSON.stringify(formData)
       })
@@ -1096,11 +1096,11 @@
         submitBtn.textContent = originalText;
         if (response.ok) {
           const data = await response.json();
-          // Mostrar resultado en el frontend
-          mostrarResultadoCotizacion(data);
+          // Mostrar resultado en el frontend, pasar formData para reenvío
+          mostrarResultadoCotizacion(data, formData);
           form.reset();
         } else {
-          alert('Hubo un error al enviar la cotización. Inténtalo de nuevo más tarde.');
+          alert('Hubo un error al obtener la cotización. Inténtalo de nuevo más tarde.');
         }
       })
       .catch(() => {
@@ -1128,7 +1128,7 @@
   if (quoteFormContainer) quoteFormContainer.style.display = '';
   if (obtenerCotizacionBtn) obtenerCotizacionBtn.style.display = '';
 
-    function mostrarResultadoCotizacion(data) {
+    function mostrarResultadoCotizacion(data, formData) {
       if (!data || !data.ok) {
         alert('No se pudo obtener la cotización.');
         return;
@@ -1146,28 +1146,31 @@
 
       // HTML principal
       resultadoDiv.innerHTML = `
-        <h2 style="color:#005baa;text-align:center;">¡Cotización enviada!</h2>
-        <p style="margin:0 0 8px 0;">Folio: <strong>${data.quote_id || ''}</strong></p>
-        <p>Revisa tu correo para la confirmación.</p>
-        <hr style="margin:16px 0;">
+        <h2 style=\"color:#005baa;text-align:center;\">Cotización generada</h2>
+        <p style=\"margin:0 0 8px 0;\">Folio: <strong>${data.quote_id || ''}</strong></p>
+        <hr style=\"margin:16px 0;\">
         <p><strong>Desglose estimado:</strong></p>
         ${lineas}
-        <table id="tabla-desglose" style="width:100%;border-collapse:collapse;">
-          <tr><td style="padding:6px 0;">Subtotal</td><td id="subtotal-celda" style="padding:6px 0;text-align:right;font-weight:600;">${moneda}${subtotal.toLocaleString('es-MX', {minimumFractionDigits:2})}</td></tr>
-          <tr><td style="padding:6px 0;">IVA (8%)</td><td id="iva-celda" style="padding:6px 0;text-align:right;font-weight:600;">${moneda}${iva.toLocaleString('es-MX', {minimumFractionDigits:2})}</td></tr>
-          <tr><td style="padding:6px 0;border-top:1px solid #e0eaf1;">Total</td><td id="total-celda" style="padding:6px 0;text-align:right;font-weight:800;color:#d32f2f;border-top:1px solid #e0eaf1;">${moneda}${total.toLocaleString('es-MX', {minimumFractionDigits:2})}</td></tr>
+        <table id=\"tabla-desglose\" style=\"width:100%;border-collapse:collapse;\">
+          <tr><td style=\"padding:6px 0;\">Subtotal</td><td id=\"subtotal-celda\" style=\"padding:6px 0;text-align:right;font-weight:600;\">${moneda}${subtotal.toLocaleString('es-MX', {minimumFractionDigits:2})}</td></tr>
+          <tr><td style=\"padding:6px 0;\">IVA (8%)</td><td id=\"iva-celda\" style=\"padding:6px 0;text-align:right;font-weight:600;\">${moneda}${iva.toLocaleString('es-MX', {minimumFractionDigits:2})}</td></tr>
+          <tr><td style=\"padding:6px 0;border-top:1px solid #e0eaf1;\">Total</td><td id=\"total-celda\" style=\"padding:6px 0;text-align:right;font-weight:800;color:#005baa;border-top:1px solid #e0eaf1;\">${moneda}${total.toLocaleString('es-MX', {minimumFractionDigits:2})}</td></tr>
         </table>
-        <div style="margin:1em 0 0 0;text-align:left;display:flex;flex-direction:column;gap:0.7em;">
-          <label style="display:flex;align-items:center;gap:0.5em;font-size:1.08em;">
-            <input type="checkbox" id="sello-ayuntamiento-checkbox" style="width:1.2em;height:1.2em;">
-            <span>Sello del ayuntamiento <span style="color:#0097a7;font-weight:600;">(+ $1,500.00)</span></span>
+        <div style=\"margin:1em 0 0 0;text-align:left;display:flex;flex-direction:column;gap:0.7em;\">
+          <label style=\"display:flex;align-items:center;gap:0.5em;font-size:1.08em;\">
+            <input type=\"checkbox\" id=\"sello-ayuntamiento-checkbox\" style=\"width:1.2em;height:1.2em;\">
+            <span>Sello del ayuntamiento <span style=\"color:#0097a7;font-weight:600;\">(+ $1,500.00)</span></span>
           </label>
-          <label style="display:flex;align-items:center;gap:0.5em;font-size:1.08em;">
-            <input type="checkbox" id="facturar-checkbox" style="width:1.2em;height:1.2em;">
-            <span>Aceptar y facturar <span style="color:#0097a7;font-weight:600;">(Recibe factura electrónica)</span></span>
+          <label style=\"display:flex;align-items:center;gap:0.5em;font-size:1.08em;visibility:hidden;\">
+            <input type=\"checkbox\" id=\"facturar-checkbox\" style=\"width:1.2em;height:1.2em;\">
+            <span>Aceptar y facturar <span style=\"color:#0097a7;font-weight:600;\">(Recibe factura electrónica)</span></span>
           </label>
         </div>
-        <p style="font-size: 0.9em; color: #555; text-align: center;">Gracias por confiar en Valura.mx</p>
+        <div style=\"text-align:center;margin-top:1.5em;\">
+          <button id=\"enviar-cotizacion-btn\" class=\"submit-btn-bold\" style=\"font-size:1.1em;padding:0.7em 2em;\">Enviar cotización</button>
+        </div>
+        <div id=\"mensaje-envio-cotizacion\" style=\"margin-top:1.5em;\"></div>
+        <p style=\"font-size: 0.9em; color: #555; text-align: center;\">Gracias por confiar en Valura.mx</p>
       `;
       resultadoDiv.style.display = 'block';
       resultadoDiv.scrollIntoView({ behavior: 'smooth' });
@@ -1187,6 +1190,42 @@
         if (facturarCheckbox.checked) {
           window.location.href = 'facturaservicio.html';
         }
+      });
+
+      // Lógica para el botón Enviar cotización
+      const enviarBtn = document.getElementById('enviar-cotizacion-btn');
+      const mensajeEnvio = document.getElementById('mensaje-envio-cotizacion');
+      let enviado = false;
+      enviarBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (enviado) return;
+        enviarBtn.disabled = true;
+        enviarBtn.textContent = 'Enviando...';
+        // Detectar entorno y elegir URL
+        let apiUrl = window.API_URL || 'https://www.valura.mx:7099/api/cotizacion';
+        fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+        .then(async response => {
+          if (response.ok) {
+            mensajeEnvio.innerHTML = `<div style='background:#e8f5e9;border:2px solid #0097a7;border-radius:10px;padding:1.2em;text-align:center;color:#2e7d32;font-weight:600;'>¡Cotización enviada! Revisa tu correo para la confirmación.</div>`;
+            enviado = true;
+            enviarBtn.style.display = 'none';
+          } else {
+            mensajeEnvio.innerHTML = `<div style='background:#ffeaea;border:2px solid #d32f2f;border-radius:10px;padding:1.2em;text-align:center;color:#d32f2f;font-weight:600;'>Hubo un error al enviar la cotización. Intenta de nuevo más tarde.</div>`;
+            enviarBtn.disabled = false;
+            enviarBtn.textContent = 'Enviar cotización';
+          }
+        })
+        .catch(() => {
+          mensajeEnvio.innerHTML = `<div style='background:#ffeaea;border:2px solid #d32f2f;border-radius:10px;padding:1.2em;text-align:center;color:#d32f2f;font-weight:600;'>Error de conexión. Intenta de nuevo más tarde.</div>`;
+          enviarBtn.disabled = false;
+          enviarBtn.textContent = 'Enviar cotización';
+        });
       });
     }
     updateFormLogic();
