@@ -916,6 +916,7 @@
                   <option value="avaluo">Avalúo</option>
                   <option value="inspeccion">Inspección de propiedad</option>
                   <option value="planos">Planos/levantamiento arquitectónico</option>
+
                 </select>
               </div>
               <div class="form-group" id="uso_avaluo_group" style="display:none;">
@@ -955,6 +956,12 @@
               <div class="form-group">
                 <label for="notas">Notas adicionales</label>
                 <textarea id="notas" name="notas" rows="2" style="width:100%;"></textarea>
+              </div>
+              <div class="form-group" id="planos_checkbox_group" style="display:none;">
+                <label style="display:flex;align-items:center;gap:0.5em;">
+                  <input type="checkbox" id="planos_arquitectonicos" name="planos_arquitectonicos">
+                  <span>Planos arquitectónicos</span>
+                </label>
               </div>
               <div class="form-group" style="text-align:center; margin-top:1.5em;">
                 <button type="submit" class="submit-btn-bold">
@@ -996,7 +1003,9 @@
     const usoAvaluoGroup = document.getElementById('uso_avaluo_group');
     const usoAvaluo = document.getElementById('uso_avaluo');
     const m2ConstruccionGroup = document.getElementById('m2_construccion_group');
+    const m2TerrenoGroup = document.getElementById('m2_terreno_group');
     const ensenadaNotice = document.getElementById('ensenada_notice');
+    const planosCheckboxGroup = document.getElementById('planos_checkbox_group');
 
     // Opciones a manipular dinámicamente
     const terrenoOption = tipoPropiedad.querySelector('option[value="terreno"]');
@@ -1032,6 +1041,22 @@
         }
       } else {
         terrenoOption.style.display = '';
+      }
+
+      // Ocultar campo de m2_terreno si el servicio es "planos"
+      if (servicioValue === 'planos') {
+        m2TerrenoGroup.style.display = 'none';
+        document.getElementById('m2_terreno').value = '';
+      } else {
+        m2TerrenoGroup.style.display = '';
+      }
+
+      // Mostrar/ocultar checkbox de planos arquitectónicos
+      if (servicioValue === 'estimacion' || servicioValue === 'avaluo') {
+        planosCheckboxGroup.style.display = '';
+      } else {
+        planosCheckboxGroup.style.display = 'none';
+        document.getElementById('planos_arquitectonicos').checked = false;
       }
     }
     function toggleConstruccion() {
@@ -1144,7 +1169,10 @@
       let total = parseFloat(data.salida?.total?.replace(/[^\d.]/g, '') || 0);
       let moneda = (data.salida?.total || '').includes('$') ? '$' : '';
 
-      // HTML principal
+      // Determinar si se debe mostrar el checkbox de sello del ayuntamiento
+      const servicioSeleccionado = (formData.servicio || '').toLowerCase();
+      const mostrarSello = !(servicioSeleccionado === 'estimacion' || servicioSeleccionado === 'inspeccion');
+
       resultadoDiv.innerHTML = `
         <h2 style=\"color:#005baa;text-align:center;\">Cotización generada</h2>
         <p style=\"margin:0 0 8px 0;\">Folio: <strong>${data.quote_id || ''}</strong></p>
@@ -1157,10 +1185,10 @@
           <tr><td style=\"padding:6px 0;border-top:1px solid #e0eaf1;\">Total</td><td id=\"total-celda\" style=\"padding:6px 0;text-align:right;font-weight:800;color:#005baa;border-top:1px solid #e0eaf1;\">${moneda}${total.toLocaleString('es-MX', {minimumFractionDigits:2})}</td></tr>
         </table>
         <div style=\"margin:1em 0 0 0;text-align:left;display:flex;flex-direction:column;gap:0.7em;\">
-          <label style=\"display:flex;align-items:center;gap:0.5em;font-size:1.08em;\">
+          ${mostrarSello ? `<label style=\"display:flex;align-items:center;gap:0.5em;font-size:1.08em;\">
             <input type=\"checkbox\" id=\"sello-ayuntamiento-checkbox\" style=\"width:1.2em;height:1.2em;\">
             <span>Sello del ayuntamiento <span style=\"color:#0097a7;font-weight:600;\">(+ $1,500.00)</span></span>
-          </label>
+          </label>` : ''}
           <label style=\"display:flex;align-items:center;gap:0.5em;font-size:1.08em;visibility:hidden;\">
             <input type=\"checkbox\" id=\"facturar-checkbox\" style=\"width:1.2em;height:1.2em;\">
             <span>Aceptar y facturar <span style=\"color:#0097a7;font-weight:600;\">(Recibe factura electrónica)</span></span>
@@ -1170,19 +1198,21 @@
           <button id=\"enviar-cotizacion-btn\" class=\"submit-btn-bold\" style=\"font-size:1.1em;padding:0.7em 2em;\">Enviar cotización</button>
         </div>
         <div id=\"mensaje-envio-cotizacion\" style=\"margin-top:1.5em;\"></div>
-        <p style=\"font-size: 0.9em; color: #555; text-align: center;\">Gracias por confiar en Valura.mx</p>
+        <p style=\"font-size: 0.9em; color: #555; text-align: center;\">Claridad, valor y forma en valura.mx</p>
       `;
       resultadoDiv.style.display = 'block';
       resultadoDiv.scrollIntoView({ behavior: 'smooth' });
 
-      // Lógica para el checkbox
+      // Lógica para el checkbox (solo si existe)
       const checkbox = document.getElementById('sello-ayuntamiento-checkbox');
       const totalCelda = document.getElementById('total-celda');
-      checkbox.addEventListener('change', function() {
-        let extra = checkbox.checked ? 1500 : 0;
-        let nuevoTotal = total + extra;
-        totalCelda.textContent = `${moneda}${nuevoTotal.toLocaleString('es-MX', {minimumFractionDigits:2})}`;
-      });
+      if (checkbox) {
+        checkbox.addEventListener('change', function() {
+          let extra = checkbox.checked ? 1500 : 0;
+          let nuevoTotal = total + extra;
+          totalCelda.textContent = `${moneda}${nuevoTotal.toLocaleString('es-MX', {minimumFractionDigits:2})}`;
+        });
+      }
 
       // Lógica para el checkbox de facturación
       const facturarCheckbox = document.getElementById('facturar-checkbox');

@@ -185,9 +185,20 @@ app.post('/api/cotizacion', async (req, res) => {
 
         <ul style="margin:0 0 12px 18px;padding:0;">${lineasHtml}</ul>
         <table style="width:100%;border-collapse:collapse;">
-          <tr><td style="padding:6px 0;">Subtotal</td><td style="padding:6px 0;text-align:right;font-weight:600;">${resultado.salida.subtotal}</td></tr>
-          <tr><td style="padding:6px 0;">IVA (8%)</td><td style="padding:6px 0;text-align:right;font-weight:600;">${resultado.salida.iva}</td></tr>
-          <tr><td style="padding:6px 0;border-top:1px solid #e0eaf1;">Total</td><td style="padding:6px 0;text-align:right;font-weight:800;color:#d32f2f;border-top:1px solid #e0eaf1;">${resultado.salida.total}</td></tr>
+          <tr>
+            <td style="padding:6px 0;">Subtotal</td>
+            <td style="padding:6px 0;text-align:right;font-weight:600;">${resultado.salida.subtotal}</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;">IVA (8%)</td>
+            <td style="padding:6px 0;text-align:right;font-weight:600;">${resultado.salida.iva}</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 0;border-top:1px solid #e0eaf1;">Total</td>
+            <td style="padding:6px 0;text-align:right;font-weight:800;color:#005baa;border-top:1px solid #e0eaf1;">
+              ${resultado.salida.total} pesos
+            </td>
+          </tr>
         </table>
 
         <hr style="margin:16px 0;">

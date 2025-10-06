@@ -81,9 +81,9 @@ function cotizar({
   return {
     salida: {
       lineas: lineas_texto,
-      subtotal: `${formatoNumeroPesos(subtotal)} pesos`,
-      iva: `${formatoNumeroPesos(montoIVA)} pesos`,
-      total: `${formatoNumeroPesos(total)} pesos`
+      subtotal: `${formatoNumeroPesos(subtotal)} `,
+      iva: `${formatoNumeroPesos(montoIVA)} `,
+      total: `${formatoNumeroPesos(total)} `
     },
     totales_numericos: { subtotal, iva: montoIVA, total },
     calculo: {
