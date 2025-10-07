@@ -159,7 +159,7 @@
         // Enviar también la cotización completa si existe
         const payload = { nombre, telefono, email, fecha, hora, folio };
         if (cotizacion) payload.cotizacion = cotizacion;
-        let apiUrl = window.API_URL || 'https://www.valura.mx:7099/api/agendar-cita';
+        let apiUrl = window.API_URL || 'http://localhost:7099/api/agendar-cita';
         fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
