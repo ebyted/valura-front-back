@@ -256,13 +256,65 @@ app.listen(port, () => {
 
 // ...existing code...
 // ...existing code...
+// --- Utilidad para Google Calendar ---
+function buildGoogleCalendarLink({ nombre, email, fecha, hora, folio }) {
+  // fecha: '2025-10-10', hora: '11:00'
+  const start = new Date(`${fecha}T${hora}:00`);
+  const end = new Date(start.getTime() + 60 * 60 * 1000); // +1 hora
+  function formatDate(d) {
+    return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  }
+  const dates = `${formatDate(start)}/${formatDate(end)}`;
+  const text = encodeURIComponent('Visita técnica Valura');
+  const details = encodeURIComponent(
+    `Folio: ${folio || ''}\nNombre: ${nombre}\nCorreo: ${email}\nFecha: ${fecha}\nHora: ${hora}`
+  );
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&dates=${dates}&details=${details}`;
+}
+
 // --- Nueva ruta para agendar cita ---
 app.post('/api/agendar-cita', async (req, res) => {
   try {
-    const { nombre, telefono, email, fecha, hora, folio } = req.body || {};
+    const { nombre, telefono, email, fecha, hora, folio, cotizacion } = req.body || {};
     if (!nombre || !telefono || !email || !fecha || !hora) {
       return res.status(400).json({ ok: false, error: 'Faltan datos para agendar la cita.' });
     }
+    // Generar link de Google Calendar
+    const calendarLink = buildGoogleCalendarLink({ nombre, email, fecha, hora, folio });
+
+    // Preparar info de cotización si viene en el request
+    let cotizacionHtml = '';
+    if (cotizacion && cotizacion.data && cotizacion.formData) {
+      const data = cotizacion.data;
+      const formData = cotizacion.formData;
+      let lineas = '';
+      if (data.salida && Array.isArray(data.salida.lineas)) {
+        lineas = '<ul>' + data.salida.lineas.map(txt => `<li>${txt}</li>`).join('') + '</ul>';
+      }
+      cotizacionHtml = `
+        <h3 style="color:#005baa;margin-top:1.5em;">Resumen de cotización pagada</h3>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:12px;">
+          <tr><td style="padding:6px 0;font-weight:bold;">Servicio:</td><td style="padding:6px 0;">${formData.servicio_label || formData.servicio || ''}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Folio:</td><td style="padding:6px 0;">${data.quote_id || folio || ''}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Nombre:</td><td style="padding:6px 0;">${formData.nombre || nombre}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Teléfono:</td><td style="padding:6px 0;">${formData.telefono || telefono}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Correo:</td><td style="padding:6px 0;">${formData.email || email}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Dirección:</td><td style="padding:6px 0;">${formData.direccion_calle || ''} #${formData.direccion_numero || ''}, Col. ${formData.direccion_colonia || ''}, ${formData.direccion_ciudad || ''}, ${formData.direccion_estado || ''}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Tipo propiedad:</td><td style="padding:6px 0;">${formData.tipo_propiedad || ''}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">m² Terreno:</td><td style="padding:6px 0;">${formData.m2_terreno || 'No especificado'}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">m² Construcción:</td><td style="padding:6px 0;">${formData.m2_construccion || 'No especificado'}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Notas:</td><td style="padding:6px 0;">${formData.notas || 'Sin notas'}</td></tr>
+        </table>
+        <div style="margin-bottom:0.7em;"><strong>Desglose:</strong></div>
+        <div style="width:100%;">${lineas}</div>
+        <table style="width:100%;border-collapse:collapse;margin-top:1em;">
+          <tr><td style="padding:6px 0;">Subtotal</td><td style="padding:6px 0;text-align:right;font-weight:600;">${data.salida?.subtotal || ''}</td></tr>
+          <tr><td style="padding:6px 0;">IVA</td><td style="padding:6px 0;text-align:right;font-weight:600;">${data.salida?.iva || ''}</td></tr>
+          <tr><td style="padding:6px 0;border-top:1px solid #e0eaf1;">Total</td><td style="padding:6px 0;text-align:right;font-weight:800;color:#005baa;border-top:1px solid #e0eaf1;">${data.salida?.total || ''} pesos</td></tr>
+        </table>
+      `;
+    }
+
     // Armar el cuerpo del correo
     const citaHtml = `
       <div style="font-family: Arial, sans-serif; color: #222; max-width: 600px; margin: auto;">
@@ -276,6 +328,10 @@ app.post('/api/agendar-cita', async (req, res) => {
           <tr><td style="padding:6px 0;font-weight:bold;">Fecha:</td><td style="padding:6px 0;">${fecha}</td></tr>
           <tr><td style="padding:6px 0;font-weight:bold;">Hora:</td><td style="padding:6px 0;">${hora}</td></tr>
         </table>
+        ${cotizacionHtml}
+        <p style="margin:1.5em 0 0.5em 0;">
+          <a href="${calendarLink}" style="background:#0097a7;color:#fff;padding:0.8em 1.5em;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">Agregar a Google Calendar</a>
+        </p>
         <p style="font-size: 0.95em; color: #555;">Por favor, confirma la cita y contacta al cliente.</p>
         <p style="font-size: 0.9em; color: #555; text-align: center;">Valura.mx</p>
       </div>
@@ -292,7 +348,7 @@ app.post('/api/agendar-cita', async (req, res) => {
       html: citaHtml
     };
     await transporter.sendMail(mailOptions);
-    return res.json({ ok: true });
+    return res.json({ ok: true, calendarLink });
   } catch (error) {
     console.error('Error en /api/agendar-cita:', error);
     return res.status(400).json({ ok: false, error: error.message || 'Error al agendar la cita' });

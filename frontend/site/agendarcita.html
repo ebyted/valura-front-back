@@ -156,18 +156,24 @@
         const fecha = document.getElementById('fecha').value;
         const hora = document.getElementById('hora').value;
         const folio = (cotizacion && cotizacion.data && cotizacion.data.quote_id) ? cotizacion.data.quote_id : '';
-        fetch('/api/agendar-cita', {
+        // Enviar también la cotización completa si existe
+        const payload = { nombre, telefono, email, fecha, hora, folio };
+        if (cotizacion) payload.cotizacion = cotizacion;
+        let apiUrl = window.API_URL || 'https://www.valura.mx:7099/api/agendar-cita';
+        fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nombre, telefono, email, fecha, hora, folio })
+          body: JSON.stringify(payload)
         })
         .then(async resp => {
           document.getElementById('formAgendar').style.display = 'none';
           document.getElementById('agendarExito').style.display = '';
-          if (resp.ok) {
+          const data = await resp.json().catch(() => ({}));
+          if (resp.ok && data && data.calendarLink) {
+            document.getElementById('agendarExito').innerHTML = `<div class='agendar-exito'>¡Cita agendada con éxito!<br>Te enviaremos la confirmación a tu correo.<br><br><a href='${data.calendarLink}' target='_blank' style='display:inline-block;margin-top:1em;background:#0097a7;color:#fff;padding:0.7em 1.5em;border-radius:8px;text-decoration:none;font-weight:600;'>Agregar a Google Calendar</a></div>`;
+          } else if (resp.ok) {
             document.getElementById('agendarExito').innerHTML = `<div class='agendar-exito'>¡Cita agendada con éxito!<br>Te enviaremos la confirmación a tu correo.</div>`;
           } else {
-            const data = await resp.json().catch(() => ({}));
             document.getElementById('agendarExito').innerHTML = `<div class='agendar-exito' style='color:#d32f2f;background:#ffeaea;border:2px solid #d32f2f;'>Error al agendar la cita: ${data.error || 'Intenta de nuevo más tarde.'}</div>`;
           }
         })
