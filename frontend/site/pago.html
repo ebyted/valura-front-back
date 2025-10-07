@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pagar cotización | Valura</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style-bold.css">
+  <style>
+    body {
+      background: url('assets/images/Cover_Valura_1.png') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Outfit', 'Inter', Arial, sans-serif;
+      color: #222;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .pago-container {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(8px) saturate(140%);
+      border-radius: 18px;
+      box-shadow: 0 8px 36px 0 rgba(0,91,170,0.13), 0 1.5px 8px 0 rgba(0,151,167,0.08);
+      padding: 2.7em 2.2em 2.2em 2.2em;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      border: 1.5px solid #e0eaf1;
+      margin: 3em auto 0 auto;
+      max-width: 480px;
+    }
+    .pago-title {
+      color: #005baa;
+      font-size: 2em;
+      font-weight: 700;
+      margin-bottom: 0.5em;
+    }
+    .pago-folio {
+      color: #333;
+      font-size: 1.1em;
+      margin-bottom: 1.5em;
+    }
+    .pago-desglose {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin: 1.5em 0 2em 0;
+      background: #e6f3fa;
+      border-radius: 10px;
+      padding: 1.2em 1.5em 1.2em 1.5em;
+      font-size: 1.08em;
+    }
+    .pago-total {
+      font-size: 1.4em;
+      font-weight: 800;
+      color: #005baa;
+      margin: 1.2em 0 2em 0;
+    }
+    .btn-pagar {
+      background: #0097a7;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.9em 2.2em;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 1.5em;
+    }
+    .btn-pagar:hover {
+      background: #005baa;
+    }
+    .pago-exito {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 2px solid #0097a7;
+      border-radius: 10px;
+      padding: 1.2em;
+      margin-top: 1.5em;
+      font-weight: 600;
+      font-size: 1.1em;
+    }
+    .btn-agendar {
+      background: #005baa;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.8em 2em;
+      font-size: 1.08em;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 1.2em;
+      transition: background 0.2s;
+    }
+    .btn-agendar:hover {
+      background: #0097a7;
+    }
+  </style>
+</head>
+<body>
+  <div class="pago-container">
+    <div class="pago-title">Pago de cotización</div>
+    <div class="pago-folio" id="folio"></div>
+    <div class="pago-desglose" id="desglose"></div>
+    <div class="pago-total" id="total"></div>
+    <button class="btn-pagar" id="btnPagar">Pagar ahora</button>
+    <div id="pagoExito" style="display:none;">
+      <div class="pago-exito">¡Pago realizado con éxito!</div>
+      <button class="btn-agendar" id="btnAgendar">Agendar cita</button>
+    </div>
+  </div>
+  <script>
+    // Cargar datos de cotización desde localStorage
+    let cotizacion = null;
+    try {
+      cotizacion = JSON.parse(localStorage.getItem('cotizacion'));
+    } catch {}
+    if (!cotizacion || !cotizacion.data || !cotizacion.formData) {
+      document.getElementById('desglose').innerHTML = '<span style="color:#d32f2f;">No se encontró información de cotización.</span>';
+      document.getElementById('btnPagar').style.display = 'none';
+    } else {
+      const data = cotizacion.data;
+      const formData = cotizacion.formData;
+      document.getElementById('folio').innerHTML = `<strong>Folio:</strong> ${data.quote_id || ''}`;
+      // Desglose
+      let lineas = '';
+      if (data.salida && Array.isArray(data.salida.lineas)) {
+        lineas = '<ul>' + data.salida.lineas.map(txt => `<li>${txt}</li>`).join('') + '</ul>';
+      }
+      document.getElementById('desglose').innerHTML = `
+        <div style="margin-bottom:0.3em;"><strong>Servicio:</strong> ${formData.servicio_label || formData.servicio || ''}</div>
+        <div style="margin-bottom:0.3em;"><strong>Nombre:</strong> ${formData.nombre || ''}</div>
+        <div style="margin:0.7em 0 0.7em 0;"><strong>Desglose:</strong></div>
+        <div style="width:100%;">${lineas}</div>
+      `;
+      document.getElementById('total').innerHTML = `Total a pagar: <span style='color:#005baa;'>${data.salida?.total || ''} pesos</span>`;
+    }
+    // Simulación de pago
+    document.getElementById('btnPagar').addEventListener('click', function() {
+      document.getElementById('btnPagar').style.display = 'none';
+      document.getElementById('pagoExito').style.display = '';
+    });
+    // Redirigir a agendar cita
+    document.getElementById('btnAgendar').addEventListener('click', function() {
+      window.location.href = 'agendarcita.html';
+    });
+  </script>
+</body>
+</html>

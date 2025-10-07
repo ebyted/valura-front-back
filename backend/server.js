@@ -1,3 +1,4 @@
+
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -251,4 +252,49 @@ app.post('/api/cotizacion', async (req, res) => {
 /* ------------------------------ Servidor ------------------------------ */
 app.listen(port, () => {
   console.log(`Servidor escuchando en http://localhost:${port}`);
+});
+
+// ...existing code...
+// ...existing code...
+// --- Nueva ruta para agendar cita ---
+app.post('/api/agendar-cita', async (req, res) => {
+  try {
+    const { nombre, telefono, email, fecha, hora, folio } = req.body || {};
+    if (!nombre || !telefono || !email || !fecha || !hora) {
+      return res.status(400).json({ ok: false, error: 'Faltan datos para agendar la cita.' });
+    }
+    // Armar el cuerpo del correo
+    const citaHtml = `
+      <div style="font-family: Arial, sans-serif; color: #222; max-width: 600px; margin: auto;">
+        <h2 style="color: #005baa; text-align: center;">Nueva cita agendada – Valura</h2>
+        <p>Se ha agendado una cita con los siguientes datos:</p>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+          <tr><td style="padding:6px 0;font-weight:bold;">Folio:</td><td style="padding:6px 0;">${folio || 'No especificado'}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Nombre:</td><td style="padding:6px 0;">${nombre}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Teléfono:</td><td style="padding:6px 0;">${telefono}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Correo:</td><td style="padding:6px 0;">${email}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Fecha:</td><td style="padding:6px 0;">${fecha}</td></tr>
+          <tr><td style="padding:6px 0;font-weight:bold;">Hora:</td><td style="padding:6px 0;">${hora}</td></tr>
+        </table>
+        <p style="font-size: 0.95em; color: #555;">Por favor, confirma la cita y contacta al cliente.</p>
+        <p style="font-size: 0.9em; color: #555; text-align: center;">Valura.mx</p>
+      </div>
+    `;
+    // Enviar correo a contacto.valura@gmail.com y al cliente
+    const destinatarios = [email, process.env.SALES_EMAIL || 'contacto.valura@gmail.com']
+      .filter(Boolean)
+      .join(',');
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: destinatarios,
+      replyTo: process.env.SALES_EMAIL || process.env.EMAIL_USER,
+      subject: `Cita agendada | Valura.mx`,
+      html: citaHtml
+    };
+    await transporter.sendMail(mailOptions);
+    return res.json({ ok: true });
+  } catch (error) {
+    console.error('Error en /api/agendar-cita:', error);
+    return res.status(400).json({ ok: false, error: error.message || 'Error al agendar la cita' });
+  }
 });

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agendar cita | Valura</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style-bold.css">
+  <style>
+    body {
+      background: url('assets/images/Cover_Valura_7.png') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Outfit', 'Inter', Arial, sans-serif;
+      color: #222;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }   
+    .agendar-container {
+      background: rgba(255,255,255,0.20);
+      backdrop-filter: blur(8px) saturate(140%);
+      border-radius: 18px;
+      box-shadow: 0 8px 36px 0 rgba(0,91,170,0.13), 0 1.5px 8px 0 rgba(0,151,167,0.08);
+      padding: 2.7em 2.2em 2.2em 2.2em;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      border: 1.5px solid #e0eaf1;
+      margin: 6.5em auto 0 auto;
+      max-width: 480px;
+    }
+    .agendar-title {
+      color: #005baa;
+      font-size: 2em;
+      font-weight: 700;
+      margin-bottom: 0.5em;
+    }
+    .agendar-folio {
+      color: #333;
+      font-size: 1.1em;
+      margin-bottom: 1.5em;
+    }
+    .agendar-form {
+      text-align: left;
+      margin: 1.5em 0 2em 0;
+    }
+    .agendar-form label {
+      font-weight: 500;
+      margin-bottom: 0.3em;
+      display: block;
+    }
+    .agendar-form input, .agendar-form select {
+      width: 100%;
+      padding: 0.7em;
+      margin-bottom: 1.1em;
+      border-radius: 6px;
+      border: 1px solid #b3c6d1;
+      font-size: 1em;
+      font-family: inherit;
+    }
+    .btn-agendar {
+      background: #005baa;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.9em 2.2em;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 0.5em;
+    }
+    .btn-agendar:hover {
+      background: #0097a7;
+    }
+    .agendar-exito {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 2px solid #0097a7;
+      border-radius: 10px;
+      padding: 1.2em;
+      margin-top: 1.5em;
+      font-weight: 600;
+      font-size: 1.1em;
+      text-align: center;
+    }
+  </style>
+</head>
+  <body>
+  <nav class="nav-bold" style="background:#f7f7f7;border-bottom:1.5px solid #e0eaf1;box-shadow:0 2px 8px #1e2b3a0a;">
+    <div class="nav-content" style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0.7em 2em;">
+      <div class="logo-bold">
+        <img src="assets/images/Logo_Principal.png" alt="Valura Logo" style="height:40px;">
+      </div>
+      <div class="nav-menu" style="display:flex;align-items:center;gap:2.5em;">
+        <a href="index.html#servicios" class="nav-link" style="color:#222;text-decoration:none;font-weight:500;">Servicios</a>
+        <a href="index.html#proceso" class="nav-link" style="color:#222;text-decoration:none;font-weight:500;">Proceso</a>
+        <a href="index.html#cotizar" class="nav-link" style="color:#222;text-decoration:none;font-weight:500;">Cotizar</a>
+        <div class="nav-contact" style="margin-left:2em;">
+          <span class="contact-text" style="font-size:0.98em;color:#0097a7;font-weight:500;">¿NECESITAS AYUDA?</span><br>
+          <a href="tel:+52-646-384-3985" class="contact-phone" style="color:#20b6b2;font-weight:700;font-size:1.08em;text-decoration:none;">+52 646 384 3985</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="agendar-container">
+    <div class="agendar-title">Agendar cita</div>
+    <div class="agendar-folio" id="folio"></div>
+    <form class="agendar-form" id="formAgendar">
+      <label for="nombre">Nombre</label>
+      <input type="text" id="nombre" name="nombre" required>
+      <label for="telefono">Teléfono</label>
+      <input type="tel" id="telefono" name="telefono" required pattern="[0-9]{10,}">
+      <label for="email">Correo electrónico</label>
+      <input type="email" id="email" name="email" required>
+      <label for="fecha">Fecha de cita</label>
+      <input type="date" id="fecha" name="fecha" required min="2025-10-07">
+      <label for="hora">Hora</label>
+      <select id="hora" name="hora" required>
+        <option value="">Selecciona una hora</option>
+        <option value="09:00">09:00</option>
+        <option value="10:00">10:00</option>
+        <option value="11:00">11:00</option>
+        <option value="12:00">12:00</option>
+        <option value="13:00">13:00</option>
+        <option value="14:00">14:00</option>
+        <option value="15:00">15:00</option>
+        <option value="16:00">16:00</option>
+        <option value="17:00">17:00</option>
+      </select>
+      <button class="btn-agendar" type="submit">Agendar cita</button>
+    </form>
+    <div id="agendarExito" style="display:none;"></div>
+  </div>
+  <script>
+    // Cargar datos de cotización desde localStorage
+    let cotizacion = null;
+    try {
+      cotizacion = JSON.parse(localStorage.getItem('cotizacion'));
+    } catch {}
+    if (cotizacion && cotizacion.data) {
+      document.getElementById('folio').innerHTML = `<strong>Folio:</strong> ${cotizacion.data.quote_id || ''}`;
+    }
+    // Prefill datos si existen
+    if (cotizacion && cotizacion.formData) {
+      document.getElementById('nombre').value = cotizacion.formData.nombre || '';
+      document.getElementById('telefono').value = cotizacion.formData.telefono || '';
+      document.getElementById('email').value = cotizacion.formData.email || '';
+    }
+    // Manejo de envío de formulario
+      document.getElementById('formAgendar').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const nombre = document.getElementById('nombre').value;
+        const telefono = document.getElementById('telefono').value;
+        const email = document.getElementById('email').value;
+        const fecha = document.getElementById('fecha').value;
+        const hora = document.getElementById('hora').value;
+        const folio = (cotizacion && cotizacion.data && cotizacion.data.quote_id) ? cotizacion.data.quote_id : '';
+        fetch('/api/agendar-cita', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre, telefono, email, fecha, hora, folio })
+        })
+        .then(async resp => {
+          document.getElementById('formAgendar').style.display = 'none';
+          document.getElementById('agendarExito').style.display = '';
+          if (resp.ok) {
+            document.getElementById('agendarExito').innerHTML = `<div class='agendar-exito'>¡Cita agendada con éxito!<br>Te enviaremos la confirmación a tu correo.</div>`;
+          } else {
+            const data = await resp.json().catch(() => ({}));
+            document.getElementById('agendarExito').innerHTML = `<div class='agendar-exito' style='color:#d32f2f;background:#ffeaea;border:2px solid #d32f2f;'>Error al agendar la cita: ${data.error || 'Intenta de nuevo más tarde.'}</div>`;
+          }
+        })
+        .catch(() => {
+          document.getElementById('formAgendar').style.display = 'none';
+          document.getElementById('agendarExito').style.display = '';
+          document.getElementById('agendarExito').innerHTML = `<div class='agendar-exito' style='color:#d32f2f;background:#ffeaea;border:2px solid #d32f2f;'>Error de conexión. Intenta de nuevo más tarde.</div>`;
+        });
+      });
+  </script>
+</body>
+</html>

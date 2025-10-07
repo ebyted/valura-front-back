@@ -1,7 +1,7 @@
 // cotizador.js
 const SERVICIOS = {
   AVALUO: "Avaluo",
-  ESTIMACION_VALOR: "EstimacionValor",
+  ESTIMACION_VALOR: "Estimación de valor",
   INSPECCION: "Inspeccion",
 };
 const IVA = 0.16; // SIEMPRE 16%
@@ -36,6 +36,8 @@ function calculaPlanos({ incluir_planos, tipo_propiedad, m2_construccion }) {
   return base + bloques * 1000;
 }
 function acentuarServicio(servicio) {
+  if (!servicio) return '';
+  if (servicio === SERVICIOS.ESTIMACION_VALOR) return 'Estimación de valor';
   let s = (servicio || "").toLowerCase();
   s = s.replace(/estimacion/g, "estimación");
   s = s.replace(/avaluo/g, "avalúo");
