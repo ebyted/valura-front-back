@@ -31,27 +31,27 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     expose:
-      - "3015" # Internal container port
+      - "7099" # Internal container port
     container_name: valura-mail
     environment:
       - NODE_ENV=production
-      - PORT=3015
+      - PORT=7099
     labels:
       # Traefik configuration
       - "traefik.enable=true"
       - "traefik.docker.network=dokploy-network"
       
       # Service configuration
-      - "traefik.http.services.valura-mail.loadbalancer.server.port=3015"
+      - "traefik.http.services.valura-mail.loadbalancer.server.port=7099"
       
       # CORS middleware
-      - "traefik.http.middlewares.valura-cors.headers.accessControlAllowOriginList=https://valura.mx,https://www.valura.mx"
+      - "traefik.http.middlewares.valura-cors.headers.accessControlAllowOriginList=https://valura.mx,https://www.valura.mx,https://valura.webitofrito.com,https://www.valura.webitofrito.com"
       - "traefik.http.middlewares.valura-cors.headers.accessControlAllowMethods=GET,POST,OPTIONS"
       - "traefik.http.middlewares.valura-cors.headers.accessControlAllowHeaders=Content-Type,Authorization,Accept"
       - "traefik.http.middlewares.valura-cors.headers.accessControlMaxAge=86400"
       
       # Router for API endpoints
-      - "traefik.http.routers.valura-mail.rule=Host(`api.valura.mx`) || (Host(`valura.mx`) && PathPrefix(`/api`))"
+      - "traefik.http.routers.valura-mail.rule=Host(`api.valura.mx`) || Host(`api.valura.webitofrito.com`) || (Host(`valura.mx`) && PathPrefix(`/api`)) || (Host(`valura.webitofrito.com`) && PathPrefix(`/api`))"
       - "traefik.http.routers.valura-mail.entrypoints=websecure"
       - "traefik.http.routers.valura-mail.tls=true"
       - "traefik.http.routers.valura-mail.tls.certresolver=letsencrypt"
@@ -60,7 +60,7 @@ services:
       - dokploy-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3015/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:7099/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -93,19 +93,19 @@ services:
       - "traefik.http.middlewares.valura-security.headers.stsPreload=true"
       - "traefik.http.middlewares.valura-security.headers.stsSeconds=31536000"
       
-      # WWW redirect middleware
-      - "traefik.http.middlewares.valura-www-redirect.redirectregex.regex=^https://www.valura.mx/(.*)"
-      - "traefik.http.middlewares.valura-www-redirect.redirectregex.replacement=https://valura.mx/$${1}"
+      # WWW redirect middleware - redirects www to non-www for both domains
+      - "traefik.http.middlewares.valura-www-redirect.redirectregex.regex=^https://www\\.(valura\\.mx|valura\\.webitofrito\\.com)/(.*)"
+      - "traefik.http.middlewares.valura-www-redirect.redirectregex.replacement=https://$${1}/$${2}"
       
       # Router for main website
-      - "traefik.http.routers.valura-homepage.rule=Host(`valura.mx`) || Host(`www.valura.mx`)"
+      - "traefik.http.routers.valura-homepage.rule=Host(`valura.mx`) || Host(`www.valura.mx`) || Host(`valura.webitofrito.com`) || Host(`www.valura.webitofrito.com`)"
       - "traefik.http.routers.valura-homepage.entrypoints=websecure"
       - "traefik.http.routers.valura-homepage.tls=true"
       - "traefik.http.routers.valura-homepage.tls.certresolver=letsencrypt"
       - "traefik.http.routers.valura-homepage.middlewares=valura-security@docker,valura-www-redirect@docker"
       
       # HTTP to HTTPS redirect
-      - "traefik.http.routers.valura-homepage-http.rule=Host(`valura.mx`) || Host(`www.valura.mx`)"
+      - "traefik.http.routers.valura-homepage-http.rule=Host(`valura.mx`) || Host(`www.valura.mx`) || Host(`valura.webitofrito.com`) || Host(`www.valura.webitofrito.com`)"
       - "traefik.http.routers.valura-homepage-http.entrypoints=web"
       - "traefik.http.routers.valura-homepage-http.middlewares=https-redirect@docker"
       - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"

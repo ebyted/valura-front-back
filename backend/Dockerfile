@@ -34,13 +34,13 @@ COPY --chown=nodeuser:nodegroup . .
 
 # Health check for better container monitoring
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:3015/health || exit 1
+    CMD curl -f http://localhost:7099/health || exit 1
 
 # Use non-root user
 USER nodeuser
 
 # Expose port
-EXPOSE 3015
+EXPOSE 7099
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]

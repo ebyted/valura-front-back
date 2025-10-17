@@ -19,14 +19,14 @@ EMAIL_USER=your-gmail@gmail.com
 EMAIL_PASS=your-app-specific-password
 SALES_EMAIL=contacto.valura@gmail.com
 WHATSAPP_NUMBER=526463843985
-PORT=3015
+PORT=7099
 NODE_ENV=production
 ```
 
 ### Important Notes
 
 - Use Gmail App Passwords, not regular passwords
-- The PORT must be 3015 as configured in the Docker setup
+- The PORT must be 7099 as configured in the Docker setup
 - Keep your `.env` file secure and never commit it to version control
 
 ## Docker Configuration
@@ -42,7 +42,7 @@ The project includes optimized Dockerfiles for production:
 ### Backend (Node.js API)
 - **Base Image**: `node:20-alpine` (multi-stage build)
 - **Security**: Non-root user, dumb-init for signal handling
-- **Port**: 3015 (internal)
+- **Port**: 7099 (internal)
 - **Features**: Health endpoint, production optimizations
 
 ## Traefik Labels Configuration
@@ -127,12 +127,12 @@ Both services include health checks:
 curl -f http://localhost:80/
 
 # Check backend health  
-curl -f http://localhost:3015/health
+curl -f http://localhost:7099/health
 ```
 
 ### Common Issues
 
-1. **Port conflicts**: Ensure PORT=3015 in backend/.env
+1. **Port conflicts**: Ensure PORT=7099 in backend/.env
 2. **Network issues**: Verify dokploy-network exists
 3. **SSL issues**: Check domain DNS and Traefik logs
 4. **Email issues**: Verify Gmail app password setup

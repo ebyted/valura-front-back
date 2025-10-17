@@ -1235,7 +1235,7 @@
         enviarBtn.disabled = true;
         enviarBtn.textContent = 'Enviando...';
         // Detectar entorno y elegir URL
-        let apiUrl = window.API_URL || 'https://www.valura.mx:7099/api/cotizacion';
+        let apiUrl = window.API_URL || '/api/cotizacion';
         fetch(apiUrl, {
           method: 'POST',
           headers: {
