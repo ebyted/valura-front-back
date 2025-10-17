@@ -137,6 +137,16 @@ app.get('/api/hola', (req, res) => {
   res.json({ mensaje: 'Hola mundo' });
 });
 
+// Health check endpoint for Docker healthcheck
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    service: 'valura-mail-service',
+    port: port
+  });
+});
+
 app.post('/api/cotizacion', async (req, res) => {
   try {
     const formData = req.body || {};
