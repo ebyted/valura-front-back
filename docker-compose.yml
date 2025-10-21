@@ -45,13 +45,13 @@ services:
       - "traefik.http.services.valura-mail.loadbalancer.server.port=7099"
       
       # CORS middleware
-      - "traefik.http.middlewares.valura-cors.headers.accessControlAllowOriginList=https://valura.mx,https://www.valura.mx,https://valura.webitofrito.com,https://www.valura.webitofrito.com"
+      - "traefik.http.middlewares.valura-cors.headers.accessControlAllowOriginList=https://valura.mx,https://www.valura.mx,https://valura.webitofrito.com,https://www.valura.webitofrito.com,https://bajalab.mx,https://www.bajalab.mx"
       - "traefik.http.middlewares.valura-cors.headers.accessControlAllowMethods=GET,POST,OPTIONS"
       - "traefik.http.middlewares.valura-cors.headers.accessControlAllowHeaders=Content-Type,Authorization,Accept"
       - "traefik.http.middlewares.valura-cors.headers.accessControlMaxAge=86400"
       
       # Router for API endpoints
-      - "traefik.http.routers.valura-mail.rule=Host(`api.valura.mx`) || Host(`api.valura.webitofrito.com`) || (Host(`valura.mx`) && PathPrefix(`/api`)) || (Host(`valura.webitofrito.com`) && PathPrefix(`/api`))"
+      - "traefik.http.routers.valura-mail.rule=Host(`api.valura.mx`) || Host(`api.valura.webitofrito.com`) || Host(`bajalab.mx`) || Host(`www.bajalab.mx`) || Host(`api.bajalab.mx`) || (Host(`valura.mx`) && PathPrefix(`/api`)) || (Host(`valura.webitofrito.com`) && PathPrefix(`/api`))"
       - "traefik.http.routers.valura-mail.entrypoints=websecure"
       - "traefik.http.routers.valura-mail.tls=true"
       - "traefik.http.routers.valura-mail.tls.certresolver=letsencrypt"

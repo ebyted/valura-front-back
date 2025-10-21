@@ -5,7 +5,7 @@ This guide explains how to deploy the Valura frontend and backend services using
 ## Prerequisites
 
 1. **Dokploy installed** on your server
-2. **Domain configured** (valura.mx and www.valura.mx pointing to your server)
+2. **Domains configured** (valura.mx, valura.webitofrito.com, and bajalab.mx pointing to your server)
 3. **Docker and Docker Compose** available on the server
 4. **SSL certificates** will be handled automatically by Traefik
 
@@ -55,8 +55,8 @@ The project includes optimized Dockerfiles for production:
 - **HTTP to HTTPS**: Automatic redirect
 
 ### Backend Labels
-- **API routing**: `/api/*` paths and `api.valura.mx` subdomain
-- **CORS**: Configured for frontend domains
+- **API routing**: `/api/*` paths, `api.valura.mx`, `api.valura.webitofrito.com`, and direct access via `bajalab.mx`
+- **CORS**: Configured for all frontend domains
 - **SSL**: Automatic Let's Encrypt certificates
 - **Health checks**: Built-in monitoring
 
@@ -112,9 +112,11 @@ curl https://api.valura.mx/health
 
 After deployment, your services will be available at:
 
-- **Frontend**: https://valura.mx
-- **API**: https://valura.mx/api/* or https://api.valura.mx/*
-- **Health Check**: https://valura.mx/health (backend health)
+- **Frontend**: https://valura.mx, https://valura.webitofrito.com
+- **API via Frontend**: https://valura.mx/api/*, https://valura.webitofrito.com/api/*
+- **API Subdomains**: https://api.valura.mx/*, https://api.valura.webitofrito.com/*, https://api.bajalab.mx/*
+- **Backend Direct**: https://bajalab.mx/* (direct backend access)
+- **Health Checks**: https://valura.mx/health, https://bajalab.mx/health
 
 ## Monitoring and Troubleshooting
 

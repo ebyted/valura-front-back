@@ -3,8 +3,8 @@
 # Test script for multi-domain configuration
 # This script tests that both domains are properly configured
 
-echo "🔍 Testing domain configuration for valura.mx and valura.webitofrito.com"
-echo "=================================================="
+echo "🔍 Testing domain configuration for valura.mx, valura.webitofrito.com, and bajalab.mx"
+echo "=============================================================================="
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -58,24 +58,32 @@ test_redirect "https://www.valura.webitofrito.com" "https://valura.webitofrito.c
 echo -e "\n${YELLOW}Testing API endpoints:${NC}"
 test_url "https://valura.mx/api/hola" "valura.mx API"
 test_url "https://valura.webitofrito.com/api/hola" "valura.webitofrito.com API"
+test_url "https://bajalab.mx/api/hola" "bajalab.mx API (backend direct)"
 test_url "https://api.valura.mx/hola" "api.valura.mx"
 test_url "https://api.valura.webitofrito.com/hola" "api.valura.webitofrito.com"
+test_url "https://api.bajalab.mx/hola" "api.bajalab.mx"
 
 echo -e "\n${YELLOW}Testing health endpoints:${NC}"
 test_url "https://valura.mx/health" "valura.mx health check"
 test_url "https://valura.webitofrito.com/health" "valura.webitofrito.com health check"
+test_url "https://bajalab.mx/health" "bajalab.mx health check (backend direct)"
 
 echo -e "\n${YELLOW}Testing HTTP to HTTPS redirects:${NC}"
 test_redirect "http://valura.mx" "https://valura.mx" "HTTP → HTTPS (valura.mx)"
 test_redirect "http://valura.webitofrito.com" "https://valura.webitofrito.com" "HTTP → HTTPS (valura.webitofrito.com)"
+test_redirect "http://bajalab.mx" "https://bajalab.mx" "HTTP → HTTPS (bajalab.mx)"
 
 echo ""
-echo "=================================================="
+echo "=============================================================================="
 echo "🏁 Domain configuration test completed!"
 echo ""
 echo "📝 Notes:"
-echo "   • Make sure both domains point to your server's IP"
+echo "   • Make sure all domains point to your server's IP:"
+echo "     - valura.mx, www.valura.mx"
+echo "     - valura.webitofrito.com, www.valura.webitofrito.com"
+echo "     - bajalab.mx, www.bajalab.mx, api.bajalab.mx"
 echo "   • DNS propagation may take up to 48 hours"
 echo "   • SSL certificates will be generated automatically by Let's Encrypt"
 echo "   • Backend runs on port 7099 internally"
+echo "   • bajalab.mx provides direct access to the backend API"
 echo "   • If tests fail, check Traefik logs: docker-compose logs traefik"
