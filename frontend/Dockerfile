@@ -20,6 +20,9 @@ COPY --chown=appuser:appgroup ./site/ /usr/local/apache2/htdocs/
 RUN chown -R appuser:appgroup /usr/local/apache2/htdocs/ && \
     chmod -R 755 /usr/local/apache2/htdocs/
 
+RUN chown -R appuser:appgroup /usr/local/apache2/logs/ && \
+    chmod -R 755 /usr/local/apache2/logs/
+
 # Health check for better container monitoring
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:80/ || exit 1
