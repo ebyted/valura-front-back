@@ -118,9 +118,3 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-
-networks:
-  dokploy-network:
-    external: true
-    # In Dokploy, this network is usually created automatically
-    # If not, create it with: docker network create dokploy-network
