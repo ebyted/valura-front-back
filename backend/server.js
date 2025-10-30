@@ -80,7 +80,9 @@ app.use(cors({
     'http://localhost:3000',
     'https://valura.mx',
     'https://www.valura.mx',
-    'http://valura-homepage'
+    'http://valura-homepage',
+    'https://bajalab.mx',
+    'https://www.bajalab.mx'
   ],
   methods: ['POST', 'OPTIONS', 'GET'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-preview'],
