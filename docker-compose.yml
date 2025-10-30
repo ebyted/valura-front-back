@@ -9,13 +9,6 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=7099
-    labels:
-      # Traefik configuration
-      - "traefik.enable=true"
-      - "traefik.docker.network=dokploy-network"
-      - "traefik.http.services.valura-mail.loadbalancer.server.port=7099"
-      - "traefik.http.routers.valura-mail.rule=Host(`bajalab.mx`) || Host(`www.bajalab.mx`) || Host(`localhost`)"
-      - "traefik.http.routers.valura-mail.entrypoints=websecure"
     networks:
       - dokploy-network
     restart: unless-stopped
@@ -25,6 +18,12 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.valura-mail.rule=Host(`api.bajalab.mx`) || Host(`www.api.bajalab.mx`)" # Replace with your desired subdomain
+      - "traefik.http.routers.valura-mail.entrypoints=websecure" # Use websecure for HTTPS
+      - "traefik.http.routers.valura-mail.tls.certresolver=dokploy-letsencrypt" # Assuming Dokploy handles Let's Encrypt
+      - "traefik.http.services.valura-mail.loadbalancer.server.port=7099" # Point to the exposed container port
 
   valura-homepage:
     build: 
@@ -35,15 +34,6 @@ services:
     container_name: valura-homepage
     environment:
       - APACHE_LOG_LEVEL=warn
-    labels:
-      # Traefik configuration
-      - "traefik.enable=true"
-      - "traefik.docker.network=dokploy-network"
-      - "traefik.http.services.valura-homepage.loadbalancer.server.port=80"
-      - "traefik.http.routers.valura-homepage.rule=Host(`bajalab.mx`) || Host(`www.bajalab.mx`)"
-      - "traefik.http.routers.valura-homepage.entrypoints=websecure"
-
-      
     networks:
       - dokploy-network
     restart: unless-stopped
@@ -53,3 +43,13 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.valura-homepage.rule=Host(`bajalab.mx`) || Host(`www.bajalab.mx`)" # Replace with your domain
+      - "traefik.http.routers.valura-homepage.entrypoints=websecure"
+      - "traefik.http.routers.valura-homepage.tls.certresolver=dokploy-letsencrypt"
+      - "traefik.http.services.valura-homepage.loadbalancer.server.port=80"
+
+networks:
+  dokploy-network:
+    external: true
