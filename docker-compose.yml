@@ -14,7 +14,7 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=dokploy-network"
       - "traefik.http.services.valura-mail.loadbalancer.server.port=7099"
-      - "traefik.http.routers.valura-mail.rule=Host(`mail.bajalab.mx`)"
+      - "traefik.http.routers.valura-mail.rule=Host(`bajalab.mx`) || Host(`www.bajalab.mx`) || Host(`localhost`)"
       - "traefik.http.routers.valura-mail.entrypoints=websecure"
     networks:
       - dokploy-network
