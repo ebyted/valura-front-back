@@ -1,31 +1,4 @@
 services:
-  # Note: Traefik is usually managed by Dokploy, so this service might not be needed
-  # Keep it commented out for Dokploy deployment
-  # traefik:
-  #   image: traefik:v3.0
-  #   command:
-  #     - "--api.dashboard=true"
-  #     - "--api.insecure=false" # Security: disabled for production
-  #     - "--providers.docker=true"
-  #     - "--providers.docker.exposedbydefault=false"
-  #     - "--entrypoints.web.address=:80"
-  #     - "--entrypoints.websecure.address=:443"
-  #     - "--certificatesresolvers.letsencrypt.acme.email=admin@example.com"
-  #     - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
-  #     - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-  #     - "--global.sendanonymoususage=false"
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   networks:
-  #     - dokploy-network
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro
-  #     - ./letsencrypt:/letsencrypt
-  #   restart: unless-stopped
-  #   security_opt:
-  #     - no-new-privileges:true
-
   valura-mail:
     build: 
       context: ./backend
@@ -40,22 +13,9 @@ services:
       # Traefik configuration
       - "traefik.enable=true"
       - "traefik.docker.network=dokploy-network"
-      
-      # Service configuration
       - "traefik.http.services.valura-mail.loadbalancer.server.port=7099"
-      
-      # CORS middleware
-      - "traefik.http.middlewares.valura-api-cors.headers.accessControlAllowOriginList=https://valura.webitofrito.com,https://www.valura.webitofrito.com,https://bajalab.mx,https://www.bajalab.mx"
-      - "traefik.http.middlewares.valura-api-cors.headers.accessControlAllowMethods=GET,POST,OPTIONS"
-      - "traefik.http.middlewares.valura-api-cors.headers.accessControlAllowHeaders=Content-Type,Authorization,Accept"
-      - "traefik.http.middlewares.valura-api-cors.headers.accessControlMaxAge=86400"
-      
-      # Router for API endpoints
-      - "traefik.http.routers.valura-mail-api.rule=Host(`api.valura.webitofrito.com`) || Host(`bajalab.mx`) || Host(`www.bajalab.mx`) || Host(`api.bajalab.mx`) || (Host(`valura.webitofrito.com`) && PathPrefix(`/api`))"
-      - "traefik.http.routers.valura-mail-api.entrypoints=websecure"
-      - "traefik.http.routers.valura-mail-api.tls=true"
-      - "traefik.http.routers.valura-mail-api.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.valura-mail-api.middlewares=valura-api-cors@docker"
+      - "traefik.http.routers.valura-mail.rule=Host(`mail.bajalab.mx`)"
+      - "traefik.http.routers.valura-mail.entrypoints=websecure"
     networks:
       - dokploy-network
     restart: unless-stopped
@@ -79,36 +39,11 @@ services:
       # Traefik configuration
       - "traefik.enable=true"
       - "traefik.docker.network=dokploy-network"
-      
-      # Service configuration
       - "traefik.http.services.valura-homepage.loadbalancer.server.port=80"
+      - "traefik.http.routers.valura-homepage.rule=Host(`bajalab.mx`) || Host(`www.bajalab.mx`)"
+      - "traefik.http.routers.valura-homepage.entrypoints=websecure"
+
       
-      # Security headers middleware
-      - "traefik.http.middlewares.valura-frontend-security.headers.frameDeny=true"
-      - "traefik.http.middlewares.valura-frontend-security.headers.sslRedirect=true"
-      - "traefik.http.middlewares.valura-frontend-security.headers.browserXssFilter=true"
-      - "traefik.http.middlewares.valura-frontend-security.headers.contentTypeNosniff=true"
-      - "traefik.http.middlewares.valura-frontend-security.headers.forceSTSHeader=true"
-      - "traefik.http.middlewares.valura-frontend-security.headers.stsIncludeSubdomains=true"
-      - "traefik.http.middlewares.valura-frontend-security.headers.stsPreload=true"
-      - "traefik.http.middlewares.valura-frontend-security.headers.stsSeconds=31536000"
-      
-      # WWW redirect middleware - redirects www to non-www for both domains
-      - "traefik.http.middlewares.valura-frontend-www-redirect.redirectregex.regex=^https://www\\.(valura\\.webitofrito\\.com|bajalab\\.mx)/(.*)"
-      - "traefik.http.middlewares.valura-frontend-www-redirect.redirectregex.replacement=https://$${1}/$${2}"
-      
-      # Router for main website
-      - "traefik.http.routers.valura-homepage-main.rule=Host(`valura.webitofrito.com`) || Host(`www.valura.webitofrito.com`)"
-      - "traefik.http.routers.valura-homepage-main.entrypoints=websecure"
-      - "traefik.http.routers.valura-homepage-main.tls=true"
-      - "traefik.http.routers.valura-homepage-main.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.valura-homepage-main.middlewares=valura-frontend-security@docker,valura-frontend-www-redirect@docker"
-      
-      # HTTP to HTTPS redirect
-      - "traefik.http.routers.valura-homepage-redirect.rule=Host(`valura.webitofrito.com`) || Host(`www.valura.webitofrito.com`)"
-      - "traefik.http.routers.valura-homepage-redirect.entrypoints=web"
-      - "traefik.http.routers.valura-homepage-redirect.middlewares=valura-https-redirect@docker"
-      - "traefik.http.middlewares.valura-https-redirect.redirectscheme.scheme=https"
     networks:
       - dokploy-network
     restart: unless-stopped
