@@ -20,7 +20,7 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.valura-mail.rule=Host(`api.bajalab.mx`) || Host(`www.api.bajalab.mx`)" # Replace with your desired subdomain
+      - "traefik.http.routers.valura-mail.rule=Host(`api.bajalab.mx`)" # Replace with your desired subdomain
       - "traefik.http.routers.valura-mail.entrypoints=websecure" # Use websecure for HTTPS
       - "traefik.http.routers.valura-mail.tls.certresolver=dokploy-letsencrypt" # Assuming Dokploy handles Let's Encrypt
       - "traefik.http.services.valura-mail.loadbalancer.server.port=7099" # Point to the exposed container port
