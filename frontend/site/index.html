@@ -1109,8 +1109,8 @@
       submitBtn.textContent = 'ENVIANDO...';
 
       // Solo mostrar desglose, NO enviar correo aún
-      let apiUrl = window.API_URL || 'https://www.valura.mx:7099/api/cotizacion';
-      fetch(apiUrl, {
+      let apiUrl = window.API_URL || 'https://www.bajalab.mx:7099/api/cotizacion';
+      fetch(apiUrl + '/cotizacion', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
