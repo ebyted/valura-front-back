@@ -1235,8 +1235,8 @@
         enviarBtn.disabled = true;
         enviarBtn.textContent = 'Enviando...';
         // Detectar entorno y elegir URL
-        let apiUrl = window.API_URL || '/api/cotizacion';
-        fetch(apiUrl, {
+        let apiUrl = window.API_URL || 'https://www.bajalab.mx/api';
+        fetch(apiUrl + '/cotizacion', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
