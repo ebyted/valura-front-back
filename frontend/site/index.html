@@ -1110,7 +1110,7 @@
 
       // Solo mostrar desglose, NO enviar correo aún
       let apiUrl = window.API_URL || 'https://api.bajalab.mx/api';
-      fetch(apiUrl + '/cotizacion', {
+      fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1236,7 +1236,7 @@
         enviarBtn.textContent = 'Enviando...';
         // Detectar entorno y elegir URL
         let apiUrl = window.API_URL || 'https://api.bajalab.mx/api';
-        fetch(apiUrl + '/cotizacion', {
+        fetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
