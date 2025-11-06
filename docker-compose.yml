@@ -1,6 +1,29 @@
 services:
+  # Traefik v3.5.5 compatible configuration (for reference)
+  # Note: Dokploy typically manages Traefik, so this is commented out
+  # traefik:
+  #   image: traefik:v3.5.5
+  #   command:
+  #     - "--api.dashboard=true"
+  #     - "--api.insecure=false"
+  #     - "--providers.docker=true"
+  #     - "--providers.docker.exposedbydefault=false"
+  #     - "--entrypoints.web.address=:80"
+  #     - "--entrypoints.websecure.address=:443"
+  #     - "--certificatesresolvers.dokploy-letsencrypt.acme.tlschallenge=true"
+  #     - "--certificatesresolvers.dokploy-letsencrypt.acme.email=admin@bajalab.mx"
+  #     - "--certificatesresolvers.dokploy-letsencrypt.acme.storage=/letsencrypt/acme.json"
+  #     - "--log.level=INFO"
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #     - ./letsencrypt:/letsencrypt
+  #   networks:
+  #     - dokploy-network
   valura-mail:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     expose:
@@ -19,15 +42,34 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      # Traefik v3.5.5 compliant configuration
       - "traefik.enable=true"
-      - "traefik.http.routers.valura-mail.rule=Host(`bajalab.mx`) && PathPrefix(`/api`)" # Replace with your desired subdomain
-      - "traefik.http.routers.valura-mail.entrypoints=websecure" # Use websecure for HTTPS
-      - "traefik.http.routers.valura-mail.tls=true"
-      - "traefik.http.routers.valura-mail.tls.certresolver=dokploy-letsencrypt" # Assuming Dokploy handles Let's Encrypt
-      - "traefik.http.services.valura-mail.loadbalancer.server.port=7099" # Point to the exposed container port"
+      - "traefik.docker.network=dokploy-network"
+      
+      # Service configuration
+      - "traefik.http.services.valura-mail.loadbalancer.server.port=7099"
+      
+      # CORS middleware for API
+      - "traefik.http.middlewares.api-cors.headers.accessControlAllowOriginList=https://bajalab.mx,https://www.bajalab.mx"
+      - "traefik.http.middlewares.api-cors.headers.accessControlAllowMethods=GET,POST,OPTIONS,PUT,DELETE"
+      - "traefik.http.middlewares.api-cors.headers.accessControlAllowHeaders=Content-Type,Authorization,Accept,X-Requested-With"
+      - "traefik.http.middlewares.api-cors.headers.accessControlAllowCredentials=true"
+      - "traefik.http.middlewares.api-cors.headers.accessControlMaxAge=86400"
+      
+      # HTTPS API router
+      - "traefik.http.routers.valura-mail-secure.rule=Host(`bajalab.mx`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.valura-mail-secure.entrypoints=websecure"
+      - "traefik.http.routers.valura-mail-secure.tls=true"
+      - "traefik.http.routers.valura-mail-secure.tls.certresolver=dokploy-letsencrypt"
+      - "traefik.http.routers.valura-mail-secure.middlewares=api-cors@docker"
+      
+      # HTTP to HTTPS redirect for API
+      - "traefik.http.routers.valura-mail-redirect.rule=Host(`bajalab.mx`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.valura-mail-redirect.entrypoints=web"
+      - "traefik.http.routers.valura-mail-redirect.middlewares=https-redirect@docker"
 
   valura-homepage:
-    build: 
+    build:
       context: ./frontend
       dockerfile: Dockerfile
     expose:
@@ -45,11 +87,43 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      # Traefik v3.5.5 compliant configuration
       - "traefik.enable=true"
-      - "traefik.http.routers.valura-homepage.rule=Host(`bajalab.mx`) || Host(`www.bajalab.mx`)" # Replace with your domain
-      - "traefik.http.routers.valura-homepage.entrypoints=websecure"
-      - "traefik.http.routers.valura-homepage.tls.certresolver=dokploy-letsencrypt"
+      - "traefik.docker.network=dokploy-network"
+      
+      # Service configuration
       - "traefik.http.services.valura-homepage.loadbalancer.server.port=80"
+      
+      # Security headers middleware
+      - "traefik.http.middlewares.security-headers.headers.frameDeny=true"
+      - "traefik.http.middlewares.security-headers.headers.sslRedirect=true"
+      - "traefik.http.middlewares.security-headers.headers.browserXssFilter=true"
+      - "traefik.http.middlewares.security-headers.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.security-headers.headers.forceSTSHeader=true"
+      - "traefik.http.middlewares.security-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.security-headers.headers.stsPreload=true"
+      - "traefik.http.middlewares.security-headers.headers.stsSeconds=31536000"
+      
+      # WWW redirect middleware
+      - "traefik.http.middlewares.www-redirect.redirectregex.regex=^https://www\\.bajalab\\.mx/(.*)"
+      - "traefik.http.middlewares.www-redirect.redirectregex.replacement=https://bajalab.mx/$${1}"
+      - "traefik.http.middlewares.www-redirect.redirectregex.permanent=true"
+      
+      # HTTPS redirect middleware
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
+      
+      # HTTPS frontend router
+      - "traefik.http.routers.valura-homepage-secure.rule=Host(`bajalab.mx`) || Host(`www.bajalab.mx`)"
+      - "traefik.http.routers.valura-homepage-secure.entrypoints=websecure"
+      - "traefik.http.routers.valura-homepage-secure.tls=true"
+      - "traefik.http.routers.valura-homepage-secure.tls.certresolver=dokploy-letsencrypt"
+      - "traefik.http.routers.valura-homepage-secure.middlewares=security-headers@docker,www-redirect@docker"
+      
+      # HTTP to HTTPS redirect for frontend
+      - "traefik.http.routers.valura-homepage-redirect.rule=Host(`bajalab.mx`) || Host(`www.bajalab.mx`)"
+      - "traefik.http.routers.valura-homepage-redirect.entrypoints=web"
+      - "traefik.http.routers.valura-homepage-redirect.middlewares=https-redirect@docker"
 
 networks:
   dokploy-network:
