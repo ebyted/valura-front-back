@@ -1109,7 +1109,7 @@
       submitBtn.textContent = 'ENVIANDO...';
 
       // Solo mostrar desglose, NO enviar correo aún
-      let apiUrl = window.API_URL || 'https://api.bajalab.mx/api';
+      let apiUrl = window.API_URL || 'https://bajalab.mx/api';
       fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -1235,7 +1235,7 @@
         enviarBtn.disabled = true;
         enviarBtn.textContent = 'Enviando...';
         // Detectar entorno y elegir URL
-        let apiUrl = window.API_URL || 'https://api.bajalab.mx/api';
+        let apiUrl = window.API_URL || 'https://bajalab.mx/api';
         fetch(apiUrl, {
           method: 'POST',
           headers: {
