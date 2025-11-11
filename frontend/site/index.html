@@ -10,7 +10,7 @@
   <script>
     // Carga automática de config según entorno
     (function() {
-      var prodHosts = ["valura.mx", "www.valura.mx"];
+      var prodHosts = ["bajalab.mx", "www.bajalab.mx"];
       var isProd = prodHosts.some(function(h) { return location.hostname.includes(h); });
       var configScript = document.createElement('script');
       configScript.src = isProd ? 'config.prod.js' : 'config.dev.js';
