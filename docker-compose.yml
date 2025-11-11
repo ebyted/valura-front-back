@@ -60,7 +60,7 @@ services:
       - "traefik.http.routers.valura-mail-secure.rule=Host(`bajalab.mx`) && PathPrefix(`/api`)"
       - "traefik.http.routers.valura-mail-secure.entrypoints=websecure"
       - "traefik.http.routers.valura-mail-secure.tls=true"
-      - "traefik.http.routers.valura-mail-secure.tls.certresolver=dokploy-letsencrypt"
+      - "traefik.http.routers.valura-mail-secure.tls.certresolver=le"
       - "traefik.http.routers.valura-mail-secure.middlewares=api-cors@docker"
       
       # HTTP to HTTPS redirect for API
