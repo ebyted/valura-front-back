@@ -66,7 +66,7 @@ services:
       # HTTP to HTTPS redirect for API
       - "traefik.http.routers.valura-mail-redirect.rule=Host(`bajalab.mx`) && PathPrefix(`/api`)"
       - "traefik.http.routers.valura-mail-redirect.entrypoints=web"
-      - "traefik.http.routers.valura-mail-redirect.middlewares=https-redirect@docker"
+      - "traefik.http.routers.valura-mail-redirect.middlewares=traefik-redirect-to-https@internal"
 
   valura-homepage:
     build:
